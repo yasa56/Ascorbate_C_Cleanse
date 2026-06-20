@@ -1,0 +1,2517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C Cleanse Protocol — Dr. Saleh</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #161b26;
+    --bg3: #1e2535;
+    --gold: #c9a84c;
+    --gold2: #e8c96a;
+    --gold-dim: rgba(201,168,76,0.15);
+    --green: #4caf7d;
+    --green-dim: rgba(76,175,125,0.15);
+    --red: #e06c6c;
+    --red-dim: rgba(224,108,108,0.15);
+    --sky: #6cb4e8;
+    --sky-dim: rgba(108,180,232,0.12);
+    --text: #e8e0d0;
+    --text-dim: #8a8070;
+    --border: rgba(201,168,76,0.18);
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { background: #0f1117 !important; }
+  html { overflow-y: scroll; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: #0f1117;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px 60px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── HEADER ── */
+  header {
+    width: 100%;
+    max-width: 100%;
+    padding: 48px 24px 36px;
+    text-align: center;
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+    margin-bottom: 28px;
+    background: #0f1117;
+    position: relative;
+    z-index: 1;
+  }
+  header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    color: #e8c96a;
+    line-height: 1.1;
+  }
+  header p {
+    margin-top: 6px;
+    font-size: 0.72rem;
+    color: #b0a898;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    width: 100%;
+    max-width: 760px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: visible;
+    background: #0f1117;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    margin-bottom: 20px;
+  }
+  .tabs::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: -20px;
+    right: -20px;
+    bottom: -12px;
+    background: #0f1117;
+    z-index: -1;
+  }
+  .tab-btn {
+    flex: 1;
+    background: #161b26;
+    border: none;
+    padding: 12px 8px;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #8a8070;
+    transition: all 0.2s;
+    border-right: 1px solid rgba(201,168,76,0.18);
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+    scroll-margin: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  .tab-btn:focus { outline: none; }
+  .tab-btn:focus-visible { outline: none; }
+  .tab-btn:last-child { border-right: none; }
+  .tab-btn.active {
+    background: #2a2210;
+    color: var(--gold);
+    font-weight: 500;
+  }
+  .tab-btn:hover:not(.active) { color: var(--text); background: var(--bg3); }
+
+  /* ── PANELS ── */
+  .panels-container {
+    width: 100%;
+    max-width: 760px;
+    position: relative;
+    padding-top: 4px;
+  }
+  .panel {
+    width: 100%;
+    max-width: 760px;
+    display: none;
+  }
+  .panel.active {
+    display: block;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 18px;
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .dot {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── FORM ELEMENTS ── */
+  label {
+    display: block;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  select, input[type="number"] {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    appearance: none;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  select:focus, input[type="number"]:focus { border-color: var(--gold); }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .form-group { margin-bottom: 14px; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 22px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .btn-gold { background: var(--gold); color: #111; }
+  .btn-gold:hover { background: var(--gold2); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-green { background: var(--green); color: #0f1117; }
+  .btn-green:hover { filter: brightness(1.1); }
+  .btn-red { background: var(--red); color: #0f1117; }
+  .btn-double-active {
+    background: var(--gold);
+    color: #111;
+    border-color: var(--gold2);
+    box-shadow: 0 0 12px rgba(201,168,76,0.5);
+    animation: pulse-gold 1s infinite;
+  }
+  @keyframes pulse-gold {
+    0%,100% { box-shadow: 0 0 8px rgba(201,168,76,0.4); }
+    50% { box-shadow: 0 0 18px rgba(201,168,76,0.8); }
+  }
+  .btn-alert-flash {
+    background: var(--red);
+    color: #fff;
+    border-color: var(--red);
+    animation: flash-alert 0.7s infinite;
+  }
+  @keyframes flash-alert {
+    0%,100% { opacity: 1; box-shadow: 0 0 8px rgba(224,108,108,0.4); }
+    50% { opacity: 0.6; box-shadow: 0 0 20px rgba(224,108,108,0.9); }
+  }
+  .btn-red:hover { filter: brightness(1.1); }
+  .btn-sm { padding: 7px 14px; font-size: 0.68rem; }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+
+  /* ── TIMER DISPLAY ── */
+  .timer-display {
+    text-align: center;
+    padding: 20px 0 10px;
+  }
+  .timer-clock {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(3.5rem, 10vw, 5.5rem);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    transition: color 0.4s;
+  }
+  .timer-clock.warning { color: var(--gold); }
+  .timer-clock.urgent { color: var(--red); animation: pulse-text 1s infinite; }
+  .timer-clock.normal { color: var(--sky); }
+  .timer-clock.done { color: var(--green); }
+
+  @keyframes pulse-text {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .timer-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    background: var(--bg3);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin: 16px 0 8px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sky), var(--gold));
+    border-radius: 4px;
+    transition: width 1s linear;
+  }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .stat-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .stat-unit {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-left: 2px;
+  }
+  .stat-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* ── DOSE LOG ── */
+  .dose-log {
+    max-height: 240px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 4px;
+  }
+  .dose-log::-webkit-scrollbar { width: 3px; }
+  .dose-log::-webkit-scrollbar-track { background: var(--bg3); }
+  .dose-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .dose-entry {
+    display: grid;
+    grid-template-columns: 36px 1fr 80px 100px;
+    align-items: center;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 14px;
+    font-size: 0.78rem;
+    animation: slideIn 0.3s ease;
+    gap: 8px;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .dose-entry .dose-num {
+    color: var(--gold);
+    font-weight: 500;
+  }
+  .dose-entry .dose-time { color: var(--text-dim); font-size: 0.68rem; }
+  .dose-entry .dose-grams { color: var(--green); font-weight: 500; text-align: center; }
+  .dose-entry .dose-cum { color: var(--sky); font-size: 0.68rem; text-align: right; }
+
+  .empty-log {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.72rem;
+    padding: 24px;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── ALERT BANNER ── */
+  .alert {
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .alert-info { background: var(--sky-dim); border: 1px solid rgba(108,180,232,0.3); color: var(--sky); }
+  .alert-gold { background: #2a2210; border: 1px solid rgba(201,168,76,0.3); color: var(--gold2); }
+  .alert-green { background: var(--green-dim); border: 1px solid rgba(76,175,125,0.3); color: var(--green); }
+  .alert-red { background: var(--red-dim); border: 1px solid rgba(224,108,108,0.3); color: var(--red); }
+  .alert-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── SUMMARY PANEL ── */
+  .summary-card {
+    background: var(--bg2);
+    border: 2px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .summary-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    margin-bottom: 20px;
+  }
+  .summary-big {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-weight: 300;
+    color: var(--gold2);
+    line-height: 1;
+  }
+  .summary-big span { font-size: 1.4rem; color: var(--text-dim); vertical-align: super; }
+  .summary-sub { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); margin-top: 4px; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .summary-item {
+    background: var(--bg3);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: left;
+  }
+  .summary-item-label { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+  .summary-item-val { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--text); font-weight: 300; }
+  .summary-item-val.green { color: var(--green); }
+  .summary-item-val.sky { color: var(--sky); }
+
+  /* ── REFERENCE TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+  }
+  th {
+    background: var(--bg3);
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg3); }
+  td.highlight { color: var(--gold2); font-weight: 500; }
+
+  /* ── REFERENCE BLOCKS ── */
+  .ref-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    font-size: 0.8rem;
+  }
+  .ref-row:last-child { border-bottom: none; }
+  .ref-key { color: var(--text-dim); }
+  .ref-val { color: var(--text); font-weight: 500; }
+  .ref-val.gold { color: var(--gold2); }
+
+  /* ── DOSE INDICATOR ── */
+  .next-dose-banner {
+    background: #2a2210;
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 8px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .next-dose-val { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--gold); font-weight: 300; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  /* ── AI SPINNER ── */
+  .ai-spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── FLOATING ALERT BUTTON ── */
+  #floating-alert-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 99999;
+    display: none;
+    padding: 14px 24px;
+    border-radius: 10px;
+    border: 2px solid #fff;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: #e06c6c;
+    color: #fff;
+    box-shadow: 0 6px 30px rgba(224,108,108,0.7);
+    animation: flash-alert 0.7s infinite;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  #floating-alert-btn:focus { outline: none; }
+
+  /* ── COPY BUTTON ── */
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .copy-btn.copied {
+    border-color: var(--green);
+    color: var(--green);
+    background: var(--green-dim);
+  }
+
+  /* ── GLOSSARY TOGGLE ── */
+  #glossary-toggle-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 99998;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+  }
+  #glossary-toggle-btn.active {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .gloss {
+    border-bottom: 1px dashed var(--gold);
+    color: inherit;
+    cursor: pointer;
+    position: relative;
+    display: inline;
+  }
+  .gloss-hidden {
+    border-bottom: none !important;
+    cursor: default !important;
+  }
+  .gloss-popup {
+    display: none;
+    position: fixed;
+    z-index: 999999;
+    background: var(--bg2);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    padding: 12px 16px;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    pointer-events: none;
+  }
+  .gloss-popup.visible { display: block; }
+  .gloss-popup-term {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .gloss-popup-def {
+    font-size: 0.76rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  /* ── TOGGLE PILL ── */
+  .toggle-pill {
+    display: inline-flex;
+    align-items: center;
+    width: 28px;
+    height: 15px;
+    border-radius: 8px;
+    background: #3a3a3a;
+    position: relative;
+    margin-left: 6px;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    vertical-align: middle;
+  }
+  .toggle-pill::after {
+    content: '';
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #8a8070;
+    left: 2px;
+    transition: left 0.2s, background 0.2s;
+  }
+  .toggle-pill.on {
+    background: rgba(201,168,76,0.3);
+  }
+  .toggle-pill.on::after {
+    left: 15px;
+    background: #c9a84c;
+  }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .badge-gold { background: #2a2210; color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+  .badge-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
+
+  /* ── NOTIFICATION TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--bg3);
+    border: 1px solid var(--gold);
+    color: var(--gold2);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── SESSION STATE ── */
+  #session-setup { display: block; }
+  #session-active { display: none; }
+  #session-complete { display: none; }
+
+  /* ── SOUND INDICATOR ── */
+  .sound-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    transition: all 0.2s;
+  }
+  .sound-toggle:hover { border-color: var(--gold); color: var(--gold); }
+
+  @media (max-width: 520px) {
+    .row2, .row3, .stat-grid { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ascorbate C Cleanse</h1>
+  <p style="margin-top:18px;">Personal Protocol Tool</p>
+  <p style="margin-top:14px;font-size:0.65rem;letter-spacing:0.14em;color:var(--text-dim);">Created by M. Y. Saleh, B.D.S., D.D.S.</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(event,'session')">⏱ Session</button>
+  <button class="tab-btn" onclick="switchTab(event,'calculator')">🧮 Calculator</button>
+  <button class="tab-btn" onclick="switchTab(event,'reference')">📋 Reference</button>
+  <button class="tab-btn" onclick="switchTab(event,'science')">🔬 Science</button>
+  <button class="tab-btn" id="glossary-nav-btn" onclick="toggleGlossary()" style="border-left:1px solid rgba(201,168,76,0.18);color:var(--text-dim);font-size:0.62rem;display:flex;align-items:center;justify-content:center;gap:4px;">📖 Terms<span class="toggle-pill" id="glossary-pill"></span></button>
+</div>
+
+<!-- ═══════════════ SESSION PANEL ═══════════════ -->
+<div class="panels-container">
+<div class="panel active" id="panel-session">
+
+  <!-- SETUP -->
+  <div id="session-setup">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Session Setup</div>
+
+      <div class="form-group">
+        <label>Health Status (determines starting dose)</label>
+        <select id="health-status" onchange="updateStartDose()">
+          <option value="0.5">Healthy — ½ tsp (1.5 g) per dose</option>
+          <option value="1" selected>Moderately Healthy — 1 tsp (3 g) per dose</option>
+          <option value="2">Ill Health — 2 tsp (6 g) per dose</option>
+        </select>
+      </div>
+
+      <div class="row2">
+        <div class="form-group">
+          <label>Dose Interval</label>
+          <select id="dose-interval" onchange="syncDoseInputs()">
+            <option value="0.033">Every 2 seconds</option>
+            <option value="0.083">Every 5 seconds</option>
+            <option value="0.167">Every 10 seconds</option>
+            <option value="0.25">Every 15 seconds</option>
+            <option value="0.5" selected>Every 30 seconds</option>
+            <option value="1">Every 1 minute</option>
+            <option value="5">Every 5 minutes</option>
+            <option value="10">Every 10 minutes</option>
+            <option value="15">Every 15 minutes</option>
+            <option value="20">Every 20 minutes</option>
+            <option value="30">Every 30 minutes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Starting Dose (tsp)</label>
+          <input type="number" id="start-dose-tsp" value="1" step="0.5" min="0.5" onchange="syncDoseInputs('tsp')">
+        </div>
+      </div>
+
+      <div id="starting-info" class="alert alert-info">
+        <span class="alert-icon">ℹ️</span>
+        <span id="starting-info-text">Starting dose: 1 tsp = 3.0 g ascorbate per dose, every 15 min. After 4 doses with no gut response, double the dose.</span>
+      </div>
+
+      <div class="form-group">
+        <label>Alert Sound</label>
+        <select id="alert-sound">
+          <option value="beep">Beep — simple tone</option>
+          <option value="chime">Chime — soft ascending</option>
+          <option value="gong" selected>Gong — deep resonant</option>
+          <option value="bell">Bell — single clear bell</option>
+          <option value="pulse">Pulse — repeating urgent</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline btn-sm" onclick="previewSound()">▷ Preview Sound</button>
+        <button class="btn btn-gold" onclick="startSession()">▶ Begin C Cleanse Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVE SESSION -->
+  <div id="session-active">
+
+    <div class="next-dose-banner">
+      <div style="flex:1;text-align:left;">
+        <div class="next-dose-label">Health Status</div>
+        <div style="font-size:0.78rem;color:var(--text);margin-top:6px;" id="active-health-status">—</div>
+      </div>
+      <div style="flex:1;text-align:center;">
+        <div class="next-dose-label">Dose (g)</div>
+        <div class="next-dose-val" id="active-dose-size" style="margin-top:4px;">3.0 g</div>
+      </div>
+      <div style="flex:1;text-align:center;">
+        <div class="next-dose-label">Dose (tsp)</div>
+        <div class="next-dose-val" id="active-dose-tsp" style="margin-top:4px;">1.0 tsp</div>
+      </div>
+      <div style="flex:1;text-align:right;">
+        <div class="next-dose-label">Interval</div>
+        <div class="next-dose-val" id="active-interval" style="margin-top:4px;">30 sec</div>
+      </div>
+    </div>
+    <div class="card" style="padding:14px 18px;margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center;">
+        <div>
+          <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;">Change Interval</div>
+          <select id="active-dose-interval" onchange="changeActiveInterval()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.8rem;appearance:none;outline:none;">
+            <option value="0.033">Every 2 seconds</option>
+            <option value="0.083">Every 5 seconds</option>
+            <option value="0.167">Every 10 seconds</option>
+            <option value="0.25">Every 15 seconds</option>
+            <option value="0.5" selected>Every 30 seconds</option>
+            <option value="1">Every 1 minute</option>
+            <option value="5">Every 5 minutes</option>
+            <option value="10">Every 10 minutes</option>
+            <option value="15">Every 15 minutes</option>
+            <option value="20">Every 20 minutes</option>
+            <option value="30">Every 30 minutes</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;">Change Dose</div>
+          <select id="active-dose-select" onchange="changeActiveDose()" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-family:'DM Mono',monospace;font-size:0.8rem;appearance:none;outline:none;">
+            <option value="1.5">½ tsp — 1.5 g</option>
+            <option value="3" selected>1 tsp — 3.0 g</option>
+            <option value="4.5">1½ tsp — 4.5 g</option>
+            <option value="6">2 tsp — 6.0 g</option>
+            <option value="7.5">2½ tsp — 7.5 g</option>
+            <option value="9">3 tsp — 9.0 g</option>
+            <option value="12">4 tsp — 12.0 g</option>
+            <option value="15">5 tsp — 15.0 g</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Countdown to Next Dose</div>
+      <div class="timer-display">
+        <div class="timer-clock normal" id="countdown-display">15:00</div>
+        <div class="timer-label" id="countdown-label">Time until next dose</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progress-bar" style="width:100%"></div>
+      </div>
+      <div class="btn-row" style="justify-content: center; gap: 12px; margin-top: 14px;">
+        <button class="btn btn-green btn-sm" id="add-dose-btn" onclick="logDose()" style="display:none;">+ Add Dose</button>
+        <button class="btn btn-outline btn-sm" id="double-dose-btn" onclick="doubleDose()">↑ Double Dose</button>
+        <button class="btn btn-gold btn-sm" id="start-btn" onclick="startTimer()" style="display:inline-flex;">▶ Start</button>
+        <button class="btn btn-outline btn-sm" id="stop-resume-btn" onclick="toggleTimer()" style="display:none;">⏸ Stop</button>
+        <button class="btn btn-outline btn-sm" onclick="resetTimer()">↺ Reset</button>
+        <button class="btn btn-outline btn-sm" id="mute-btn" onclick="stopAlert()" style="display:none;">🔔 Sound On</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Running Totals</div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-val" id="stat-doses">0</div>
+          <div class="stat-label">Doses</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="stat-grams">0.0<span class="stat-unit">g</span></div>
+          <div class="stat-label">Total Ascorbate</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="stat-elapsed">0:00</div>
+          <div class="stat-label">Elapsed</div>
+        </div>
+      </div>
+
+      <div id="four-dose-alert" style="display:none" class="alert alert-gold">
+        <span class="alert-icon">⚠️</span>
+        <span>4 doses completed with no gut response — consider doubling the dose per protocol.</span>
+      </div>
+
+      <div id="fifty-gram-alert" style="display:none" class="alert alert-red">
+        <span class="alert-icon">🔴</span>
+        <span>Over 50 g consumed. Take at least 10% of total (≥5 g) again in late afternoon/evening.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Dose Log</div>
+      <div class="dose-log" id="dose-log">
+        <div class="empty-log">No doses logged yet — press "Log Dose Taken" after each dose</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Projected End-of-Session Totals</div>
+      <div class="stat-grid" style="margin-bottom:14px;">
+        <div class="stat-box">
+          <div class="stat-val" id="live-flush-total">0.0<span class="stat-unit">g</span></div>
+          <div class="stat-label">Flush Total</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="live-daily-dose">0.0<span class="stat-unit">g</span></div>
+          <div class="stat-label">Daily Dose (75%)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="live-per-dose">—</div>
+          <div class="stat-label">Per Dose (4×/day)</div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;">Flush Complete?</div>
+          <div style="font-size:0.78rem;color:var(--text);">Watery / enema-like evacuation achieved</div>
+        </div>
+        <button class="btn btn-green" onclick="completeSession()">✓ Mark Flush Complete</button>
+      </div>
+      <div class="divider"></div>
+      <div style="text-align:center;">
+        <button class="btn btn-outline btn-sm" onclick="cancelSession()">✕ Cancel / Reset Session</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION COMPLETE -->
+  <div id="session-complete">
+    <div class="summary-card">
+      <div class="summary-title">✦ Session Complete ✦</div>
+      <div class="summary-big" id="summary-flush-grams">0<span>g</span></div>
+      <div class="summary-sub">Total Ascorbate to Flush</div>
+
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-item-label">Daily Therapeutic Dose (75%)</div>
+          <div class="summary-item-val green" id="summary-daily">0 g</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-item-label">Per Dose (2–4× daily)</div>
+          <div class="summary-item-val sky" id="summary-per-dose">0 g</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-item-label">Total Doses Taken</div>
+          <div class="summary-item-val" id="summary-doses">0</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-item-label">Session Duration</div>
+          <div class="summary-item-val" id="summary-duration">0 min</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Per Dose Explanation -->
+    <div class="card" style="margin-top:18px;">
+      <div class="card-title"><span class="dot"></span> What Your Daily Dose Means</div>
+      <div id="per-dose-explanation" style="font-size:0.82rem;line-height:1.8;color:var(--text);"></div>
+    </div>
+
+    <!-- AI Narration Card -->
+    <div class="card" style="margin-top:4px;">
+      <div class="card-title"><span class="dot"></span> Clinical Summary</div>
+      <div id="ai-narration-loading" style="display:none;text-align:center;padding:20px 0;">
+        <div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;">Generating clinical note…</div>
+        <div class="ai-spinner"></div>
+      </div>
+      <div id="ai-narration-content" style="display:none;">
+        <div style="margin-bottom:18px;">
+          <div style="font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:12px;">Clinical Note</div>
+          <div id="ai-clinical-note" style="font-family:'Cormorant Garamond',serif;font-size:1rem;line-height:1.9;color:var(--text);"></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+            <button class="copy-btn" id="copy-clinical-btn" onclick="copySection('ai-clinical-note','copy-clinical-btn')">📋 Copy</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--sky);border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:12px;">Patient Explanation</div>
+          <div id="ai-patient-note" style="font-size:0.82rem;line-height:1.9;color:var(--text);"></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+            <button class="copy-btn" id="copy-patient-btn" onclick="copySection('ai-patient-note','copy-patient-btn')">📋 Copy</button>
+          </div>
+        </div>
+      </div>
+      <div id="ai-narration-error" style="display:none;" class="alert alert-red">
+        <span class="alert-icon">⚠️</span><span id="ai-error-text">Could not generate summary.</span>
+      </div>
+    </div>
+
+    <div id="fifty-gram-summary" style="display:none" class="alert alert-gold">
+      <span class="alert-icon">📌</span>
+      <span id="fifty-gram-summary-text">Your calibration was over 50 g. Take at least 10% of your total in the late afternoon/evening.</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Your Dose Log</div>
+      <div class="dose-log" id="dose-log-final"></div>
+    </div>
+
+    <div class="btn-row" style="justify-content:center; margin-top: 6px;">
+      <button class="btn btn-gold" onclick="newSession()">+ New Session</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ CALCULATOR PANEL ═══════════════ -->
+<div class="panel" id="panel-calculator">
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Flush-to-Daily Dose Calculator</div>
+    <p style="font-size:0.76rem;color:var(--text-dim);margin-bottom:16px;line-height:1.6;">Enter the total ascorbate consumed during your calibration flush. The calculator returns your recommended daily therapeutic dose (75% of flush total) and suggested per-dose amounts.</p>
+
+    <div class="row2">
+      <div class="form-group">
+        <label>Total Flush — Half-Teaspoons (½ tsp = 1.5 g)</label>
+        <input type="number" id="calc-half-tsp" min="0" step="1" placeholder="e.g. 10" oninput="calcFromHalfTsp()">
+      </div>
+      <div class="form-group">
+        <label>— or — Total Grams Consumed</label>
+        <input type="number" id="calc-grams" min="0" step="0.5" placeholder="e.g. 15" oninput="calcFromGrams()">
+      </div>
+    </div>
+
+    <div id="calc-results" style="display:none">
+      <div class="divider"></div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-val" id="cr-flush">—</div>
+          <div class="stat-label">Flush Total (g)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="cr-daily">—</div>
+          <div class="stat-label">Daily Dose (g)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="cr-half-tsp-day">—</div>
+          <div class="stat-label">½ tsp / day</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <div class="card-title" style="font-size:0.95rem;margin-bottom:10px;"><span class="dot"></span> Per-Dose Breakdown</div>
+        <div id="per-dose-table"></div>
+      </div>
+
+      <div id="calc-alert-50" style="display:none;margin-top:14px;" class="alert alert-red">
+        <span class="alert-icon">📌</span>
+        <span id="calc-alert-50-text"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Quick Conversion</div>
+    <div class="ref-row">
+      <span class="ref-key">½ tsp buffered ascorbate</span>
+      <span class="ref-val gold">1.5 g ascorbate</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-key">1 tsp buffered ascorbate</span>
+      <span class="ref-val gold">3.0 g ascorbate</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-key">2 tsp buffered ascorbate</span>
+      <span class="ref-val gold">6.0 g ascorbate</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-key">Daily dose = flush × 75%</span>
+      <span class="ref-val">protocol rule</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-key">If flush &gt; 50 g</span>
+      <span class="ref-val">take 10% again in afternoon</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Reference Dose Table</div>
+    <table>
+      <thead>
+        <tr>
+          <th>½ tsp doses</th>
+          <th>Flush Total (g)</th>
+          <th>Daily 75% (g)</th>
+          <th>½ tsp / day</th>
+        </tr>
+      </thead>
+      <tbody id="ref-table-body"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ═══════════════ REFERENCE PANEL ═══════════════ -->
+<div class="panel" id="panel-reference">
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Starting Dose by Health Status</div>
+    <table>
+      <thead>
+        <tr><th>Status</th><th>Dose</th><th>Grams</th><th>Interval</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Healthy</td><td>½ tsp</td><td class="highlight">1.5 g</td><td>Every 15 min</td></tr>
+        <tr><td>Moderately Healthy</td><td>1 tsp</td><td class="highlight">3.0 g</td><td>Every 15 min</td></tr>
+        <tr><td>Ill Health</td><td>2 tsp</td><td class="highlight">6.0 g</td><td>Every 15 min</td></tr>
+      </tbody>
+    </table>
+    <div class="alert alert-gold" style="margin-top:12px;">
+      <span class="alert-icon">⚠️</span>
+      <span>If no gut gurgling after 4 doses — double the dose and continue every 15 minutes.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Endpoint &amp; Daily Dosing</div>
+    <div class="ref-row">
+      <span class="ref-key">Target endpoint</span>
+      <span class="ref-val">Watery / enema-like evacuation</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-key">Stop at loose stool?</span>
+      <span class="ref-val" style="color:var(--red)">No — continue to full watery flush</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-key">After flush &gt; 50 g</span>
+      <span class="ref-val">Take 10% of total later in day</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-key">Daily maintenance</span>
+      <span class="ref-val">75% of flush total, 2–4 doses/day</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-key">Healthy adult typical range</span>
+      <span class="ref-val">2–10 g / day</span>
+    </div>
+    <div class="ref-row">
+      <span class="ref-key">Repeat frequency</span>
+      <span class="ref-val">Weekly recommended</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Preferred Ascorbate Form</div>
+    <div class="ref-row"><span class="ref-key">Form</span><span class="ref-val">100% l-ascorbate, fully reduced, buffered mineral</span></div>
+    <div class="ref-row"><span class="ref-key">Potassium (per g)</span><span class="ref-val gold">66 mg</span></div>
+    <div class="ref-row"><span class="ref-key">Calcium (per g)</span><span class="ref-val gold">27 mg</span></div>
+    <div class="ref-row"><span class="ref-key">Magnesium (per g)</span><span class="ref-val gold">11 mg</span></div>
+    <div class="ref-row"><span class="ref-key">Zinc (per g)</span><span class="ref-val gold">400 mcg</span></div>
+    <div class="ref-row"><span class="ref-key">Half-tsp = 1.5 g minerals</span><span class="ref-val">K 99 mg · Ca 40 mg · Mg 16 mg · Zn 600 mcg</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Supporting Supplements</div>
+    <div class="ref-row"><span class="ref-key">Choline Citrate</span><span class="ref-val">1 tsp (1,300 mg) twice daily</span></div>
+    <div class="ref-row"><span class="ref-key">Magnesium</span><span class="ref-val">110 mg elemental twice daily</span></div>
+    <div class="ref-row"><span class="ref-key">L-Glutamine</span><span class="ref-val">1,500 mg + 500 mg PAK twice daily</span></div>
+    <div class="ref-row"><span class="ref-key">Probiotics</span><span class="ref-val">2–4 caps (lactobacillus/bifidobacterium) with meals</span></div>
+    <div class="ref-row"><span class="ref-key">Quercetin</span><span class="ref-val">500 mg + 5 mg OPC twice daily</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Practical Tips</div>
+    <div style="font-size:0.78rem;line-height:1.8;color:var(--text);">
+      <div style="margin-bottom:8px;">• Dissolve each dose in <strong>2+ oz water</strong>. Room temperature is best for absorption.</div>
+      <div style="margin-bottom:8px;">• Allow effervescence to abate (~2 min) before drinking.</div>
+      <div style="margin-bottom:8px;">• Batch option: dissolve up to 10 tsp (30 g) in 10–20 oz water; store in capped dark bottle; stable 1 day if cool &amp; sealed.</div>
+      <div style="margin-bottom:8px;">• Hot or burning stools: apply calendula ointment externally.</div>
+      <div style="margin-bottom:8px;">• To stop ascorbate: taper gradually — do <em>not</em> stop suddenly.</div>
+      <div>• First session: plan to stay home most of the day (3–8+ hours possible).</div>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="panel" id="panel-science">
+
+  <!-- HERO -->
+  <div style="background:linear-gradient(135deg,#0f1117 0%,#1a1f2e 50%,#0f1117 100%);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:32px 28px;margin-bottom:20px;text-align:center;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#c9a84c,transparent);"></div>
+    <div style="font-size:2.8rem;margin-bottom:10px;">🍊</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:300;color:#e8c96a;letter-spacing:0.04em;margin-bottom:8px;">The Science of Ascorbate</div>
+    <div style="font-size:0.75rem;color:#8a8070;letter-spacing:0.14em;text-transform:uppercase;">Biochemistry · Physiology · Clinical Evidence</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px;">
+      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:14px 10px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#c9a84c;">300+</div>
+        <div style="font-size:0.62rem;color:#8a8070;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;">Enzymatic Roles</div>
+      </div>
+      <div style="background:rgba(108,180,232,0.08);border:1px solid rgba(108,180,232,0.2);border-radius:8px;padding:14px 10px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#6cb4e8;">10–30g</div>
+        <div style="font-size:0.62rem;color:#8a8070;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;">Daily if we synthesized it</div>
+      </div>
+      <div style="background:rgba(76,175,125,0.08);border:1px solid rgba(76,175,125,0.2);border-radius:8px;padding:14px 10px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#4caf7d;">100×</div>
+        <div style="font-size:0.62rem;color:#8a8070;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;">Faster ROS neutralization vs glutathione</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: BIOCHEMISTRY & MOLECULAR STRUCTURE -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Molecular Biochemistry</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;">
+        <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Reduced Form</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--text);margin-bottom:4px;">L-Ascorbate (AA)</div>
+        <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.6;">The biologically active, electron-rich form. Monoanion at physiological pH. Primary antioxidant in plasma and cytoplasm.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;">
+        <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--sky);margin-bottom:8px;">Oxidized Form</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--text);margin-bottom:4px;">Dehydroascorbate (DHA)</div>
+        <div style="font-size:0.72rem;color:var(--text-dim);line-height:1.6;">Reversibly oxidized. Transported via GLUT1/3. Rapidly recycled back to AA by glutathione and thioredoxin reductase.</div>
+      </div>
+    </div>
+    <div style="font-size:0.8rem;line-height:1.8;color:var(--text);margin-bottom:14px;">Ascorbate is a unique antioxidant because it donates a <strong style="color:var(--gold)">single electron</strong> rather than two. This produces the ascorbyl free radical (monodehydroascorbate) — a notably stable, unreactive species that preferentially dismutates rather than propagating oxidative chain reactions. This chemical behavior makes ascorbate a <em>terminal</em> antioxidant: it stops radical chains without generating dangerous intermediates.</div>
+    <div style="background:var(--bg3);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:12px 16px;font-size:0.78rem;line-height:1.7;color:var(--text-dim);">
+      <strong style="color:var(--gold);">Ascorbate Recycling Pathway:</strong><br>
+      AA → Ascorbyl Radical → DHA → AA (via glutathione/thioredoxin reductase)<br>
+      This loop preserves vitamin C at minimal metabolic cost.
+    </div>
+  </div>
+
+  <!-- SECTION 2: PHYSIOLOGY & TRANSPORT -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Physiology & Transport</div>
+    <div style="font-size:0.8rem;line-height:1.8;color:var(--text);margin-bottom:16px;">Humans, guinea pigs, and most primates lack the enzyme <strong style="color:var(--red)">L-gulonolactone oxidase (GULO)</strong> — the final enzyme in a 6-step glucose-to-ascorbate biosynthesis pathway. Without it, we depend entirely on dietary intake. Most mammals synthesize 10–30 g/day endogenously; under stress, production more than doubles.</div>
+
+    <div style="margin-bottom:16px;">
+      <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Intestinal Absorption — Dual Transporter System</div>
+      <div style="display:grid;gap:8px;">
+        <div style="background:var(--bg3);border-radius:8px;padding:12px 14px;display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:rgba(201,168,76,0.2);border-radius:6px;padding:6px 10px;font-size:0.7rem;color:var(--gold);font-weight:500;white-space:nowrap;">SVCT1</div>
+          <div style="font-size:0.76rem;line-height:1.6;color:var(--text-dim);">Located on apical brush-border of intestinal epithelium and renal tubules. High-capacity, Na⁺-coupled (2:1 ratio). Governs whole-body ascorbate homeostasis and prevents renal loss. Expression is downregulated when plasma levels are high.</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px 14px;display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:rgba(108,180,232,0.2);border-radius:6px;padding:6px 10px;font-size:0.7rem;color:var(--sky);font-weight:500;white-space:nowrap;">SVCT2</div>
+          <div style="font-size:0.76rem;line-height:1.6;color:var(--text-dim);">Ubiquitously expressed — brain, retina, placenta, adrenal glands, neurons. High-affinity, low-capacity. Protects metabolically active tissues from oxidative stress. Essential for brain development (Slc23a2 knockout mice show high perinatal mortality).</div>
+        </div>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px 14px;display:flex;gap:14px;align-items:flex-start;">
+          <div style="background:rgba(76,175,125,0.2);border-radius:6px;padding:6px 10px;font-size:0.7rem;color:var(--green);font-weight:500;white-space:nowrap;">GLUT1/3</div>
+          <div style="font-size:0.76rem;line-height:1.6;color:var(--text-dim);">Transports the oxidized form DHA. Competed by glucose — high blood glucose reduces vitamin C uptake into cells. Critical in erythrocytes and blood-brain barrier.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Tissue Concentration Gradient</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.74rem;color:var(--text-dim);">Adrenal Glands</span>
+        <span style="color:var(--gold);font-weight:500;font-size:0.78rem;">~2000 µM</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.74rem;color:var(--text-dim);">Brain / Neurons</span>
+        <span style="color:var(--gold);font-weight:500;font-size:0.78rem;">~1000 µM</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.74rem;color:var(--text-dim);">Leukocytes</span>
+        <span style="color:var(--sky);font-weight:500;font-size:0.78rem;">~1000–4000 µM</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.74rem;color:var(--text-dim);">Plasma</span>
+        <span style="color:var(--text-dim);font-weight:500;font-size:0.78rem;">~50–80 µM</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.74rem;color:var(--text-dim);">Corneal Epithelium</span>
+        <span style="color:var(--green);font-weight:500;font-size:0.78rem;">~1000+ µM</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.74rem;color:var(--text-dim);">Skeletal Muscle</span>
+        <span style="color:var(--text-dim);font-weight:500;font-size:0.78rem;">~200 µM</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: ANTIOXIDANT MECHANISMS -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Antioxidant Mechanisms</div>
+    <div style="font-size:0.8rem;line-height:1.8;color:var(--text);margin-bottom:16px;">Ascorbate functions as the <strong style="color:var(--gold)">primary aqueous antioxidant</strong> in human plasma, operating more than 100× faster than glutathione at scavenging superoxide radical (O₂•⁻) and singlet oxygen (¹O₂). It is especially critical in the nucleus, which contains little or no superoxide dismutase (SOD) activity.</div>
+
+    <div style="display:grid;gap:10px;">
+      <div style="background:var(--bg3);border-radius:8px;padding:14px 16px;">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">ROS Scavenging</div>
+        <div style="font-size:0.76rem;line-height:1.6;color:var(--text-dim);">Directly neutralizes superoxide (O₂•⁻), hydroxyl radical (•OH), singlet oxygen (¹O₂), and hypochlorous acid (HOCl) generated by neutrophils during immune activation.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px 16px;">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--sky);margin-bottom:6px;">Vitamin E Regeneration</div>
+        <div style="font-size:0.76rem;line-height:1.6;color:var(--text-dim);">Ascorbate reduces the tocopheroxyl radical (vitamin E•) back to α-tocopherol at the membrane–aqueous interface, extending lipid-phase antioxidant protection. Without ascorbate, oxidized vitamin E becomes pro-oxidant.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px 16px;">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:6px;">Glutathione Recycling</div>
+        <div style="font-size:0.76rem;line-height:1.6;color:var(--text-dim);">Ascorbate upregulates glutathione synthesis and spares it from oxidative consumption. Clinical data: high-dose vitamin C increases leukocyte glutathione by up to 50%. This synergy amplifies the entire cellular antioxidant network.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px 16px;">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--red);margin-bottom:6px;">LDL Protection</div>
+        <div style="font-size:0.76rem;line-height:1.6;color:var(--text-dim);">Ascorbate prevents LDL oxidation in plasma, a critical step in atherogenesis. It must be fully depleted from plasma before LDL lipid peroxidation can begin — making it the first line of cardiovascular defense.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px 16px;">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">DNA Protection</div>
+        <div style="font-size:0.76rem;line-height:1.6;color:var(--text-dim);">Eliminates O₂•⁻ in the nucleus where SOD is absent. Prevents 8-hydroxy-deoxyguanosine (8-OHdG) formation — a key oxidative DNA lesion linked to cancer initiation. Also cofactor for TET enzymes involved in epigenetic demethylation.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: ENZYMATIC COFACTOR ROLES -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Enzymatic Cofactor Roles</div>
+    <div style="font-size:0.78rem;line-height:1.8;color:var(--text);margin-bottom:16px;">Ascorbate serves as an essential cofactor for <strong style="color:var(--gold)">Fe²⁺/2-oxoglutarate–dependent dioxygenases</strong> — a family of over 60 enzymes that require ascorbate to keep their iron center in the active Fe²⁺ state. Without ascorbate, iron oxidizes to Fe³⁺ and the enzyme stops working.</div>
+    <div style="display:grid;gap:8px;">
+      <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div>
+          <div style="font-size:0.76rem;color:var(--text);font-weight:500;margin-bottom:3px;">Prolyl & Lysyl Hydroxylases</div>
+          <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;">Hydroxylate proline and lysine residues in procollagen — essential for triple-helix stabilization and cross-linking. Deficiency → scurvy: unraveling collagen, bleeding gums, poor wound healing.</div>
+        </div>
+        <div style="font-size:0.62rem;background:rgba(201,168,76,0.15);color:var(--gold);padding:4px 8px;border-radius:4px;white-space:nowrap;">Collagen</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div>
+          <div style="font-size:0.76rem;color:var(--text);font-weight:500;margin-bottom:3px;">Dopamine β-Hydroxylase</div>
+          <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;">Converts dopamine → norepinephrine in adrenal medulla and sympathetic neurons. Ascorbate is the electron donor that regenerates the copper cofactor. Links ascorbate to stress response and mood.</div>
+        </div>
+        <div style="font-size:0.62rem;background:rgba(108,180,232,0.15);color:var(--sky);padding:4px 8px;border-radius:4px;white-space:nowrap;">Catecholamines</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div>
+          <div style="font-size:0.76rem;color:var(--text);font-weight:500;margin-bottom:3px;">Peptidyl-Glycine α-Amidating Monooxygenase (PAM)</div>
+          <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;">Activates ~50% of neuropeptides and hormones requiring C-terminal amidation — including oxytocin, vasopressin, gastrin, CRH, and calcitonin. Ascorbate is the obligatory electron donor.</div>
+        </div>
+        <div style="font-size:0.62rem;background:rgba(76,175,125,0.15);color:var(--green);padding:4px 8px;border-radius:4px;white-space:nowrap;">Hormones</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div>
+          <div style="font-size:0.76rem;color:var(--text);font-weight:500;margin-bottom:3px;">Carnitine Biosynthesis (γ-Butyrobetaine Hydroxylase)</div>
+          <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;">Two ascorbate-dependent steps required for carnitine synthesis — the mitochondrial shuttle for long-chain fatty acid oxidation. Deficiency causes fatigue and impaired fat metabolism.</div>
+        </div>
+        <div style="font-size:0.62rem;background:rgba(224,108,108,0.15);color:var(--red);padding:4px 8px;border-radius:4px;white-space:nowrap;">Energy</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div>
+          <div style="font-size:0.76rem;color:var(--text);font-weight:500;margin-bottom:3px;">HIF Prolyl Hydroxylases (PHDs) & TET Enzymes</div>
+          <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;">PHDs regulate hypoxia-inducible factor (HIF-1α) — controlling oxygen-sensing, VEGF, and erythropoietin. TET enzymes control DNA demethylation and epigenetic reprogramming. Ascorbate is essential for both.</div>
+        </div>
+        <div style="font-size:0.62rem;background:rgba(201,168,76,0.15);color:var(--gold);padding:4px 8px;border-radius:4px;white-space:nowrap;">Epigenetics</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: IRON, MINERALS & VITAMINS -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Mineral & Vitamin Interactions</div>
+
+    <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Iron — The Most Clinically Significant Interaction</div>
+    <div style="font-size:0.78rem;line-height:1.8;color:var(--text);margin-bottom:12px;">Ascorbate dramatically enhances non-heme iron absorption through two mechanisms: <strong style="color:var(--gold)">reduction</strong> of Fe³⁺ → Fe²⁺ (the form transported by DMT-1) and <strong style="color:var(--gold)">chelation</strong> — forming a soluble Fe–ascorbate complex that resists alkalinization in the duodenum. Ascorbate can overcome all dietary inhibitors of iron absorption (phytates, polyphenols, calcium) when consumed together.</div>
+
+    <div style="display:grid;gap:8px;margin-bottom:16px;">
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.75rem;color:var(--text);">Vitamin E (α-Tocopherol)</span>
+        <span style="font-size:0.7rem;color:var(--green);">↑ Regenerates oxidized vitamin E → antioxidant synergy</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.75rem;color:var(--text);">Folate (B9)</span>
+        <span style="font-size:0.7rem;color:var(--green);">↑ Stabilizes tetrahydrofolate; protects from oxidation</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.75rem;color:var(--text);">Zinc & Selenium</span>
+        <span style="font-size:0.7rem;color:var(--green);">↑ Synergistic immune and antioxidant support</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.75rem;color:var(--text);">Copper</span>
+        <span style="font-size:0.7rem;color:var(--red);">⚠ Complex: ascorbate reduces Cu²⁺→Cu⁺ (needed for enzymes); excess can be pro-oxidant in vitro</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.75rem;color:var(--text);">Calcium & Magnesium</span>
+        <span style="font-size:0.7rem;color:var(--sky);">↑ Buffered ascorbate preserves mineral balance; supports bone collagen matrix</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.75rem;color:var(--text);">Vitamin B12</span>
+        <span style="font-size:0.7rem;color:var(--red);">⚠ High-dose ascorbate in vitro can degrade B12 — not confirmed in vivo at physiological doses</span>
+      </div>
+    </div>
+
+    <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--red);margin-bottom:10px;">Heavy Metal Interactions</div>
+    <div style="font-size:0.78rem;line-height:1.8;color:var(--text);margin-bottom:12px;">Ascorbate has documented protective and chelating activity against multiple toxic metals through oxidative stress reduction, glutathione recycling, and direct chelation:</div>
+    <div style="display:grid;gap:8px;">
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:0.75rem;color:var(--text);font-weight:500;">Lead (Pb)</span>
+          <span style="font-size:0.62rem;background:rgba(76,175,125,0.15);color:var(--green);padding:2px 8px;border-radius:4px;">Clinically Studied</span>
+        </div>
+        <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;">500–1000 mg/day significantly reduces blood lead levels in humans. Vitamin C reduces urinary lead excretion markers. Less potent than EDTA but additive with it.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:0.75rem;color:var(--text);font-weight:500;">Mercury (Hg)</span>
+          <span style="font-size:0.62rem;background:rgba(76,175,125,0.15);color:var(--green);padding:2px 8px;border-radius:4px;">Protective</span>
+        </div>
+        <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;">Alleviates mercury toxicity independently of iron. Raises glutathione levels which directly chelates methylmercury. Iron exacerbates mercury toxicity — avoid co-supplementation.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:7px;padding:10px 14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:0.75rem;color:var(--text);font-weight:500;">Cadmium (Cd) & Arsenic (As)</span>
+          <span style="font-size:0.62rem;background:rgba(108,180,232,0.15);color:var(--sky);padding:2px 8px;border-radius:4px;">Indirect via Iron & Glutathione</span>
+        </div>
+        <div style="font-size:0.7rem;color:var(--text-dim);line-height:1.5;">Cadmium toxicity alleviated via iron metabolism modulation. Ascorbate reduces arsenic-induced oxidative damage and lowers gestational diabetes risk from arsenic/mercury exposure. High vitamin C intake modifies heavy metal–GDM association.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: CARDIOVASCULAR & BLOOD PRESSURE -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Cardiovascular & Blood Pressure</div>
+    <div style="font-size:0.8rem;line-height:1.8;color:var(--text);margin-bottom:16px;">Ascorbate acts on the cardiovascular system through <strong style="color:var(--gold)">four converging molecular pathways</strong>, making it one of the most pleiotropic cardiovascular nutrients known:</div>
+    <div style="display:grid;gap:10px;margin-bottom:16px;">
+      <div style="background:var(--bg3);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:14px 16px;">
+        <div style="font-size:0.72rem;font-weight:500;color:var(--gold);margin-bottom:6px;">1 · Nitric Oxide (NO) Preservation</div>
+        <div style="font-size:0.75rem;line-height:1.6;color:var(--text-dim);">Ascorbate upregulates eNOS expression and activity, increases tetrahydrobiopterin (BH4) — the essential eNOS cofactor — and directly scavenges O₂•⁻ that degrades NO. Result: more bioavailable NO → vasodilation, reduced blood pressure, improved endothelial function. Acute IV infusion (3 g) significantly lowers BP in hypertensive patients but not normotensive subjects.</div>
+      </div>
+      <div style="background:var(--bg3);border-left:3px solid var(--sky);border-radius:0 8px 8px 0;padding:14px 16px;">
+        <div style="font-size:0.72rem;font-weight:500;color:var(--sky);margin-bottom:6px;">2 · Collagen Synthesis & Arterial Integrity</div>
+        <div style="font-size:0.75rem;line-height:1.6;color:var(--text-dim);">Ascorbate is the obligatory cofactor for type IV collagen synthesis — critical for basement membrane formation, endothelial cell adhesion, and arterial wall elasticity. Promotes endothelial proliferation and inhibits apoptosis under inflammatory conditions. Daily 500 mg lowered systolic BP by ~10% after one month in clinical trials.</div>
+      </div>
+      <div style="background:var(--bg3);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:14px 16px;">
+        <div style="font-size:0.72rem;font-weight:500;color:var(--green);margin-bottom:6px;">3 · Anti-Inflammatory Pathways (NF-κB & Nrf2)</div>
+        <div style="font-size:0.75rem;line-height:1.6;color:var(--text-dim);">Inhibits NF-κB — the master inflammatory transcription factor — reducing ICAM-1, VCAM-1, and pro-inflammatory cytokine expression. Simultaneously activates Nrf2, upregulating endogenous antioxidant enzyme expression (HO-1, NQO1). Attenuates post-MI inflammatory injury and improves left ventricular ejection fraction.</div>
+      </div>
+      <div style="background:var(--bg3);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:14px 16px;">
+        <div style="font-size:0.72rem;font-weight:500;color:var(--red);margin-bottom:6px;">4 · LDL Protection & Atherosclerosis Prevention</div>
+        <div style="font-size:0.75rem;line-height:1.6;color:var(--text-dim);">Plasma ascorbate must be fully depleted before LDL oxidation begins. Ascorbate is the first plasma antioxidant consumed during oxidative stress, acting as a sacrificial protector of LDL. Prevents the initial oxidative step in atherosclerotic plaque formation. Also modulates TGF-β extracellular matrix remodeling and platelet aggregation via collagen-dependent pathways.</div>
+      </div>
+    </div>
+    <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:8px;padding:14px 16px;font-size:0.76rem;line-height:1.7;color:var(--text-dim);">
+      <strong style="color:var(--gold);">Clinical Evidence Summary:</strong> Low plasma vitamin C is independently associated with hypertension, endothelial dysfunction, heart disease, atherosclerosis, and stroke. Meta-analyses show supplementation produces modest but consistent reductions in both systolic and diastolic BP, with greatest effect in hypertensive individuals.
+    </div>
+  </div>
+
+  <!-- SECTION 7: GLUCOSE & METABOLIC INTERACTIONS -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Glucose, Insulin & Metabolic Effects</div>
+    <div style="font-size:0.8rem;line-height:1.8;color:var(--text);margin-bottom:16px;">The relationship between ascorbate and glucose metabolism is bidirectional and clinically critical — they <strong style="color:var(--gold)">compete for the same cellular transporters</strong>:</div>
+
+    <div style="display:grid;gap:8px;margin-bottom:16px;">
+      <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">GLUT Transporter Competition</div>
+        <div style="font-size:0.75rem;line-height:1.6;color:var(--text-dim);">DHA (oxidized vitamin C) enters cells via GLUT1 and GLUT3 — the same transporters used by glucose. High blood glucose competitively inhibits DHA uptake. This means diabetic patients with chronically elevated glucose have chronically reduced intracellular vitamin C — despite adequate dietary intake. Insulin stimulates GLUT4 expression, which may indirectly improve ascorbate availability.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--sky);margin-bottom:6px;">Pancreatic β-Cell Protection</div>
+        <div style="font-size:0.75rem;line-height:1.6;color:var(--text-dim);">β-cells are highly susceptible to oxidative damage due to low endogenous antioxidant enzyme expression. Ascorbate protects β-cells from ROS-induced apoptosis, preserving insulin secretory capacity. Heavy metal–induced ROS (Hg, As) impairs β-cell function — vitamin C attenuates this pathway.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:6px;">Insulin Sensitivity & Glucose Homeostasis</div>
+        <div style="font-size:0.75rem;line-height:1.6;color:var(--text-dim);">Ascorbate reduces oxidative stress–driven insulin resistance. Prevents high glucose–induced endothelial apoptosis in vitro. Sorbitol pathway activation in diabetic hyperglycemia depletes intracellular ascorbate. Some trials show modest fasting glucose reduction with supplementation; effects are more pronounced in type 2 diabetics.</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px 16px;">
+        <div style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Clinical Implication for Diabetic Patients</div>
+        <div style="font-size:0.75rem;line-height:1.6;color:var(--text-dim);">Diabetics require higher ascorbate intake to achieve the same intracellular levels as non-diabetics. Serum glucose concentrations must be considered alongside vitamin C levels when assessing status. The buffered mineral l-ascorbate form avoids the acidic pH stress of plain ascorbic acid, making it preferable in metabolically compromised patients.</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(224,108,108,0.08);border:1px solid rgba(224,108,108,0.2);border-radius:8px;padding:14px 16px;font-size:0.76rem;line-height:1.7;color:var(--text-dim);">
+      <strong style="color:var(--red);">Important Note:</strong> High-dose ascorbate can interfere with glucose oxidase–based blood glucose test strips (false low readings). Patients on continuous glucose monitoring should note this interaction and inform their clinicians.
+    </div>
+  </div>
+
+  <!-- SECTION 8: IMMUNE & NEUROLOGICAL -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Immune & Neurological Roles</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div>
+        <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Immune System</div>
+        <div style="display:grid;gap:7px;">
+          <div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:0.7rem;line-height:1.5;color:var(--text-dim);">Leukocytes accumulate ascorbate 50–100× above plasma levels — rapidly depleted during infection</div>
+          <div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:0.7rem;line-height:1.5;color:var(--text-dim);">Enhances neutrophil chemotaxis, phagocytosis, and oxidative burst; protects neutrophils from self-oxidative damage</div>
+          <div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:0.7rem;line-height:1.5;color:var(--text-dim);">Stimulates proliferation and differentiation of T-lymphocytes and natural killer (NK) cells</div>
+          <div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:0.7rem;line-height:1.5;color:var(--text-dim);">Interferon-like antiviral activity; reduces duration and severity of viral infections</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--sky);margin-bottom:10px;">Neurological System</div>
+        <div style="display:grid;gap:7px;">
+          <div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:0.7rem;line-height:1.5;color:var(--text-dim);">SVCT2 maintains brain ascorbate at ~10× plasma levels — essential for neurotransmitter synthesis and myelin integrity</div>
+          <div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:0.7rem;line-height:1.5;color:var(--text-dim);">Required for dopamine → norepinephrine conversion (dopamine β-hydroxylase cofactor)</div>
+          <div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:0.7rem;line-height:1.5;color:var(--text-dim);">Modulates HPA axis; ascorbate depletion in adrenal glands is the earliest sign of psychological stress</div>
+          <div style="background:var(--bg3);border-radius:7px;padding:9px 12px;font-size:0.7rem;line-height:1.5;color:var(--text-dim);">TET enzyme cofactor — regulates neuronal DNA methylation, memory consolidation, and stem cell pluripotency</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER CITATION -->
+  <div style="text-align:center;padding:16px 0 8px;font-size:0.62rem;color:var(--text-dim);letter-spacing:0.08em;line-height:1.8;">
+    <span style="color:var(--gold);">M. Y. Saleh, B.D.S., D.D.S. · Ascorbate C Cleanse Protocol Tool</span>
+  </div>
+
+</div>
+</div><!-- end panels-container -->
+
+<!-- FLOATING ALERT BUTTON — visible on any tab -->
+<button id="floating-alert-btn" onclick="stopAlert()">🔔 Stop Alert</button>
+
+<!-- GLOSSARY TOGGLE moved to nav bar -->
+
+<!-- GLOSSARY POPUP -->
+<div id="gloss-popup" class="gloss-popup">
+  <div class="gloss-popup-term" id="gloss-popup-term"></div>
+  <div class="gloss-popup-def" id="gloss-popup-def"></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ═══ STATE ═══
+let sessionState = {
+  running: false,
+  doseGrams: 3.0,
+  baseDoseGrams: 3.0,  // original dose — never changed
+  oneTimeDouble: false,
+  beepInterval: null,
+  alertSound: 'gong',
+  intervalMin: 15,
+  doses: [],
+  totalGrams: 0,
+  startTime: null,
+  countdownSec: 15 * 60,
+  totalSec: 15 * 60,
+  timerHandle: null,
+  elapsedHandle: null,
+  sessionStart: null,
+  soundEnabled: true,
+};
+
+// ═══ TAB SWITCHING ═══
+function switchTab(e, tab) {
+  if (e) { e.preventDefault(); e.stopPropagation(); }
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['session','calculator','reference','science'][i] === tab);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  // Glossary button is always in nav bar — no show/hide needed
+}
+
+// ═══ SETUP HELPERS ═══
+function updateStartDose() {
+  const val = parseFloat(document.getElementById('health-status').value);
+  document.getElementById('start-dose-tsp').value = val;
+  syncDoseInputs('tsp');
+}
+
+function syncDoseInputs(from) {
+  const tsp = parseFloat(document.getElementById('start-dose-tsp').value) || 1;
+  const grams = (tsp * 3).toFixed(1);
+  const interval = document.getElementById('dose-interval').value;
+  const intervalNum = parseFloat(interval);
+  const intervalDisplay = intervalNum < 1 ? Math.round(intervalNum * 60) + ' sec' : intervalNum + ' min';
+  document.getElementById('starting-info-text').textContent =
+    `Starting dose: ${tsp} tsp = ${grams} g ascorbate per dose, every ${intervalDisplay}. After 4 doses with no gut response, double the dose.`;
+}
+
+document.getElementById('dose-interval').addEventListener('change', syncDoseInputs);
+
+// ═══ SESSION CONTROL ═══
+function startSession() {
+  const tsp = parseFloat(document.getElementById('start-dose-tsp').value) || 1;
+  const interval = parseFloat(document.getElementById('dose-interval').value);
+  sessionState.doseGrams = parseFloat((tsp * 3).toFixed(2));
+  sessionState.baseDoseGrams = sessionState.doseGrams;
+  sessionState.intervalMin = interval;
+  sessionState.doses = [];
+  sessionState.totalGrams = 0;
+  sessionState.totalSec = Math.round(interval * 60);
+  sessionState.countdownSec = sessionState.totalSec;
+  sessionState.sessionStart = null;
+  sessionState.running = false;
+
+  sessionState.alertSound = document.getElementById('alert-sound').value;
+  const statusMap = {'0.5':'Healthy','1':'Moderately Healthy','2':'Ill Health'};
+  const statusKey = document.getElementById('health-status').value;
+  document.getElementById('active-health-status').textContent = statusMap[statusKey] || statusKey + ' tsp';
+  document.getElementById('active-dose-size').textContent = sessionState.doseGrams.toFixed(1) + ' g';
+  let intervalLabel;
+  if (interval < 1) {
+    intervalLabel = Math.round(interval * 60) + ' sec';
+  } else {
+    intervalLabel = interval + ' min';
+  }
+  document.getElementById('active-interval').textContent = intervalLabel;
+  document.getElementById('four-dose-alert').style.display = 'none';
+  document.getElementById('fifty-gram-alert').style.display = 'none';
+
+  document.getElementById('session-setup').style.display = 'none';
+  document.getElementById('session-active').style.display = 'block';
+
+  // Auto-log dose #1 immediately
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  sessionState.totalGrams = sessionState.doseGrams;
+  sessionState.doses.push({
+    num: 1,
+    time: timeStr,
+    grams: sessionState.doseGrams,
+    cumulative: parseFloat(sessionState.totalGrams.toFixed(2))
+  });
+  document.getElementById('stat-doses').textContent = 1;
+  document.getElementById('stat-grams').innerHTML = sessionState.totalGrams.toFixed(1) + '<span class="stat-unit">g</span>';
+  updateDoseLog();
+  updateLiveCalc();
+
+  // Sync active interval dropdown to match setup selection
+  const setupInterval = document.getElementById('dose-interval').value;
+  document.getElementById('active-dose-interval').value = setupInterval;
+  // Sync dose dropdown to starting dose
+  const startingDose = sessionState.doseGrams.toFixed(1);
+  const doseSelect = document.getElementById('active-dose-select');
+  // Find closest option
+  let closest = null;
+  let minDiff = Infinity;
+  for (const opt of doseSelect.options) {
+    const diff = Math.abs(parseFloat(opt.value) - sessionState.doseGrams);
+    if (diff < minDiff) { minDiff = diff; closest = opt; }
+  }
+  if (closest) closest.selected = true;
+
+  // Show Start button — timer does NOT run until user presses Start
+  document.getElementById('start-btn').style.display = 'inline-flex';
+  document.getElementById('stop-resume-btn').style.display = 'none';
+  updateTimerDisplay();
+  showToast('Session ready — dose #1 logged. Press ▶ Start when ready.');
+}
+
+function startTimer() {
+  if (sessionState.running) return;
+  sessionState.running = true;
+  if (!sessionState.sessionStart) sessionState.sessionStart = Date.now();
+  if (sessionState.timerHandle) clearInterval(sessionState.timerHandle);
+  sessionState.timerHandle = setInterval(tickTimer, 1000);
+  if (sessionState.elapsedHandle) clearInterval(sessionState.elapsedHandle);
+  sessionState.elapsedHandle = setInterval(updateElapsed, 1000);
+  updateTimerDisplay();
+  document.getElementById('start-btn').style.display = 'none';
+  document.getElementById('stop-resume-btn').style.display = 'inline-flex';
+  document.getElementById('stop-resume-btn').textContent = '⏸ Stop';
+  document.getElementById('stop-resume-btn').style.color = '';
+  document.getElementById('stop-resume-btn').style.borderColor = '';
+  showToast('Timer started');
+}
+
+function tickTimer() {
+  sessionState.countdownSec--;
+  if (sessionState.countdownSec <= 0) {
+    sessionState.countdownSec = 0;
+    updateTimerDisplay();
+    // Stop the main timer so tickTimer stops firing
+    clearInterval(sessionState.timerHandle);
+    sessionState.timerHandle = null;
+    sessionState.running = false;
+    // Update stop/resume button back to show Start
+    document.getElementById('stop-resume-btn').style.display = 'none';
+    document.getElementById('start-btn').style.display = 'inline-flex';
+    // Start repeating beep and show flashing stop button
+    playAlertSound();
+    if (!sessionState.beepInterval) {
+      sessionState.beepInterval = setInterval(playAlertSound, 2000);
+    }
+    const muteBtn = document.getElementById('mute-btn');
+    muteBtn.style.display = 'inline-flex';
+    muteBtn.classList.add('btn-alert-flash');
+    muteBtn.textContent = '🔔 Sound On';
+    // Also show floating button — visible on any tab
+    const floatBtn = document.getElementById('floating-alert-btn');
+    if (floatBtn) floatBtn.style.display = 'block';
+    document.getElementById('add-dose-btn').style.display = 'inline-flex';
+    showToast('⏰ Time for your next dose!');
+    return;
+  }
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const sec = sessionState.countdownSec;
+  const min = Math.floor(sec / 60);
+  const s = sec % 60;
+  const display = document.getElementById('countdown-display');
+  const label = document.getElementById('countdown-label');
+  display.textContent = `${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  const ratio = sec / sessionState.totalSec;
+  document.getElementById('progress-bar').style.width = (ratio * 100) + '%';
+
+  display.className = 'timer-clock';
+  if (sec === 0) {
+    display.classList.add('done');
+    label.textContent = '⚡ Take your dose now!';
+  } else if (sec <= 60) {
+    display.classList.add('urgent');
+    label.textContent = 'Dose due very soon';
+  } else if (sec <= sessionState.totalSec * 0.35) {
+    display.classList.add('warning');
+    label.textContent = 'Approaching dose time';
+  } else {
+    display.classList.add('normal');
+    label.textContent = 'Time until next dose';
+  }
+}
+
+function updateElapsed() {
+  if (!sessionState.sessionStart) return;
+  const elapsed = Math.floor((Date.now() - sessionState.sessionStart) / 1000);
+  const m = Math.floor(elapsed / 60);
+  const s = elapsed % 60;
+  document.getElementById('stat-elapsed').textContent = `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function logDose() {
+  document.getElementById('add-dose-btn').style.display = 'none';
+  stopAlert();
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  sessionState.totalGrams += sessionState.doseGrams;
+  sessionState.doses.push({
+    num: sessionState.doses.length + 1,
+    time: timeStr,
+    grams: sessionState.doseGrams,
+    cumulative: parseFloat(sessionState.totalGrams.toFixed(2))
+  });
+
+  document.getElementById('stat-doses').textContent = sessionState.doses.length;
+  document.getElementById('stat-grams').innerHTML = sessionState.totalGrams.toFixed(1) + '<span class="stat-unit">g</span>';
+
+  // Alerts
+  if (sessionState.doses.length === 4) {
+    document.getElementById('four-dose-alert').style.display = 'flex';
+  }
+  if (sessionState.totalGrams > 50) {
+    document.getElementById('fifty-gram-alert').style.display = 'flex';
+    document.getElementById('four-dose-alert').style.display = 'none';
+  }
+
+  updateDoseLog();
+  updateLiveCalc();
+
+  // Revert to base dose if this was a one-time double
+  if (sessionState.oneTimeDouble) {
+    sessionState.oneTimeDouble = false;
+    sessionState.doseGrams = sessionState.baseDoseGrams;
+    document.getElementById('active-dose-size').textContent = sessionState.doseGrams.toFixed(1) + ' g';
+    document.getElementById('active-dose-tsp').textContent = (sessionState.doseGrams / 3).toFixed(2) + ' tsp';
+    const btn = document.getElementById('double-dose-btn');
+    btn.classList.remove('btn-double-active');
+    btn.textContent = '↑ Double Dose';
+    showToast(`Dose reverted to ${sessionState.doseGrams.toFixed(1)} g`);
+  }
+
+  // Reset and restart timer after logging a dose
+  stopAlert();
+  sessionState.countdownSec = sessionState.totalSec;
+  clearInterval(sessionState.timerHandle);
+  sessionState.running = true;
+  sessionState.timerHandle = setInterval(tickTimer, 1000);
+  document.getElementById('start-btn').style.display = 'none';
+  document.getElementById('stop-resume-btn').style.display = 'inline-flex';
+  document.getElementById('stop-resume-btn').textContent = '⏸ Stop';
+  document.getElementById('stop-resume-btn').style.color = '';
+  document.getElementById('stop-resume-btn').style.borderColor = '';
+  updateTimerDisplay();
+  showToast(`Dose #${sessionState.doses.length} logged — ${sessionState.doseGrams.toFixed(1)} g (total: ${sessionState.totalGrams.toFixed(1)} g)`);
+}
+
+function doubleDose() {
+  const doubled = parseFloat((sessionState.baseDoseGrams * 2).toFixed(2));
+  sessionState.doseGrams = doubled;
+  sessionState.oneTimeDouble = true;
+  document.getElementById('active-dose-size').textContent = doubled.toFixed(1) + ' g ⚡';
+  document.getElementById('active-dose-tsp').textContent = (doubled / 3).toFixed(2) + ' tsp';
+  const btn = document.getElementById('double-dose-btn');
+  btn.classList.add('btn-double-active');
+  btn.textContent = '⚡ Double Active';
+  showToast(`Next dose doubled → ${doubled.toFixed(1)} g — reverts after`);
+}
+
+function resetTimer() {
+  clearInterval(sessionState.timerHandle);
+  sessionState.running = false;
+  sessionState.countdownSec = sessionState.totalSec;
+  updateTimerDisplay();
+  document.getElementById('start-btn').style.display = 'inline-flex';
+  document.getElementById('stop-resume-btn').style.display = 'none';
+  showToast('Timer reset — press Start to begin again');
+}
+
+function updateDoseLog() {
+  const log = document.getElementById('dose-log');
+  if (sessionState.doses.length === 0) {
+    log.innerHTML = '<div class="empty-log">No doses logged yet — press "Log Dose Taken" after each dose</div>';
+    return;
+  }
+  log.innerHTML = [...sessionState.doses].reverse().map(d => `
+    <div class="dose-entry">
+      <span class="dose-num">#${d.num}</span>
+      <span class="dose-time">${d.time}</span>
+      <span class="dose-grams">${d.grams.toFixed(1)} g</span>
+      <span class="dose-cum">Cum: ${d.cumulative.toFixed(1)} g</span>
+    </div>
+  `).join('');
+}
+
+function changeActiveInterval() {
+  const val = parseFloat(document.getElementById('active-dose-interval').value);
+  sessionState.intervalMin = val;
+  sessionState.totalSec = Math.round(val * 60);
+  sessionState.countdownSec = sessionState.totalSec;
+
+  let label;
+  if (val < 1) {
+    label = Math.round(val * 60) + ' sec';
+  } else {
+    label = val + ' min';
+  }
+  document.getElementById('active-interval').textContent = label;
+
+  if (sessionState.running) {
+    clearInterval(sessionState.timerHandle);
+    sessionState.timerHandle = setInterval(tickTimer, 1000);
+  }
+  updateTimerDisplay();
+  showToast('Interval changed to ' + label);
+}
+
+function changeActiveDose() {
+  const val = parseFloat(document.getElementById('active-dose-select').value);
+  // Update both doseGrams AND baseDoseGrams so Double Dose works correctly
+  sessionState.doseGrams = val;
+  sessionState.baseDoseGrams = val;
+  // Reset any active double dose
+  sessionState.oneTimeDouble = false;
+  const btn = document.getElementById('double-dose-btn');
+  btn.classList.remove('btn-double-active');
+  btn.textContent = '↑ Double Dose';
+  // Update banner display
+  document.getElementById('active-dose-size').textContent = val.toFixed(1) + ' g';
+  document.getElementById('active-dose-tsp').textContent = (val / 3).toFixed(2) + ' tsp';
+  showToast('Dose changed to ' + val.toFixed(1) + ' g (' + (val/3).toFixed(2) + ' tsp)');
+}
+
+function toggleTimer() {
+  const btn = document.getElementById('stop-resume-btn');
+  if (sessionState.running) {
+    // Pause
+    clearInterval(sessionState.timerHandle);
+    sessionState.running = false;
+    btn.textContent = '▶ Resume';
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+    showToast('Timer paused');
+  } else {
+    // Resume
+    sessionState.running = true;
+    sessionState.timerHandle = setInterval(tickTimer, 1000);
+    btn.textContent = '⏸ Stop';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    showToast('Timer resumed');
+  }
+}
+
+function updateLiveCalc() {
+  const total = sessionState.totalGrams;
+  const daily = parseFloat((total * 0.75).toFixed(1));
+  const perDose4 = parseFloat((daily / 4).toFixed(2));
+  document.getElementById('live-flush-total').innerHTML = total.toFixed(1) + '<span class="stat-unit">g</span>';
+  document.getElementById('live-daily-dose').innerHTML = daily.toFixed(1) + '<span class="stat-unit">g</span>';
+  document.getElementById('live-per-dose').textContent = perDose4.toFixed(1) + ' g';
+}
+
+function playCompletionSound() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const ctx = new AC();
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5 E5 G5 C6
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18);
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.18);
+      gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + i * 0.18 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.5);
+      osc.start(ctx.currentTime + i * 0.18);
+      osc.stop(ctx.currentTime + i * 0.18 + 0.6);
+    });
+  } catch(e) {}
+}
+
+function completeSession() {
+  clearInterval(sessionState.timerHandle);
+  clearInterval(sessionState.elapsedHandle);
+  stopAlert(); // stop any active alert sound immediately
+  playCompletionSound();
+
+  const total = sessionState.totalGrams;
+  const daily = parseFloat((total * 0.75).toFixed(1));
+  const perDose2 = parseFloat((daily / 2).toFixed(1));
+  const perDose4 = parseFloat((daily / 4).toFixed(1));
+  const elapsed = sessionState.sessionStart ? Math.round((Date.now() - sessionState.sessionStart) / 60000) : 0;
+  sessionState.alertSound = document.getElementById('alert-sound').value;
+  const statusMap = {'0.5':'Healthy','1':'Moderately Healthy','2':'Ill Health'};
+  const healthStatus = statusMap[document.getElementById('health-status').value] || 'Moderately Healthy';
+
+  document.getElementById('summary-flush-grams').innerHTML = total.toFixed(1) + '<span>g</span>';
+  document.getElementById('summary-daily').textContent = daily + ' g / day';
+  document.getElementById('summary-per-dose').textContent = `${perDose4}–${perDose2} g (2–4× daily)`;
+  document.getElementById('summary-doses').textContent = sessionState.doses.length;
+  document.getElementById('summary-duration').textContent = elapsed + ' min';
+
+  // 50g alert
+  const alert50 = document.getElementById('fifty-gram-summary');
+  if (total > 50) {
+    const extra = parseFloat((total * 0.1).toFixed(1));
+    document.getElementById('fifty-gram-summary-text').textContent =
+      `Your flush was ${total.toFixed(1)} g. Take at least ${extra} g again in late afternoon/evening.`;
+    alert50.style.display = 'flex';
+  } else {
+    alert50.style.display = 'none';
+  }
+
+  // Copy log
+  const logFinal = document.getElementById('dose-log-final');
+  logFinal.innerHTML = [...sessionState.doses].reverse().map(d => `
+    <div class="dose-entry">
+      <span class="dose-num">#${d.num}</span>
+      <span class="dose-time">${d.time}</span>
+      <span class="dose-grams">${d.grams.toFixed(1)} g</span>
+      <span class="dose-cum">Cum: ${d.cumulative.toFixed(1)} g</span>
+    </div>
+  `).join('');
+
+  document.getElementById('session-active').style.display = 'none';
+  document.getElementById('session-complete').style.display = 'block';
+
+  // Dynamic per-dose explanation
+  renderPerDoseExplanation(total, daily);
+
+  // AI narration
+  generateClinicalNarration(total, daily, sessionState.doses.length, elapsed, healthStatus);
+}
+
+function renderPerDoseExplanation(flushTotal, daily) {
+  const d2 = (daily / 2).toFixed(1);
+  const d3 = (daily / 3).toFixed(1);
+  const d4 = (daily / 4).toFixed(1);
+  const t2 = (daily / 2 / 3).toFixed(2);
+  const t3 = (daily / 3 / 3).toFixed(2);
+  const t4 = (daily / 4 / 3).toFixed(2);
+
+  document.getElementById('per-dose-explanation').innerHTML = `
+    <p style="margin-bottom:12px;">Your daily therapeutic dose is <strong style="color:var(--gold)">${daily} g</strong> of buffered l-ascorbate — this is 75% of your total flush amount of <strong>${flushTotal.toFixed(1)} g</strong>, calibrated to your body's current ascorbate need.</p>
+    <p style="margin-bottom:14px;">Divide this across the day as follows:</p>
+    <div style="display:grid;gap:8px;">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:var(--text-dim);font-size:0.75rem;letter-spacing:0.06em;">If taken 2× per day</span>
+        <span style="color:var(--sky);font-weight:500;">${d2} g &nbsp;<span style="color:var(--text-dim);font-size:0.68rem;">(${t2} tsp)</span> per dose</span>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:var(--text-dim);font-size:0.75rem;letter-spacing:0.06em;">If taken 3× per day</span>
+        <span style="color:var(--sky);font-weight:500;">${d3} g &nbsp;<span style="color:var(--text-dim);font-size:0.68rem;">(${t3} tsp)</span> per dose</span>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:var(--text-dim);font-size:0.75rem;letter-spacing:0.06em;">If taken 4× per day</span>
+        <span style="color:var(--sky);font-weight:500;">${d4} g &nbsp;<span style="color:var(--text-dim);font-size:0.68rem;">(${t4} tsp)</span> per dose</span>
+      </div>
+    </div>
+    <p style="margin-top:12px;font-size:0.74rem;color:var(--text-dim);line-height:1.7;">Spreading the dose across the day maintains a steadier plasma ascorbate level. Most people find 3–4 times daily optimal for sustained antioxidant and immune support.</p>
+  `;
+}
+
+async function generateClinicalNarration(flushTotal, daily, doseCount, duration, healthStatus) {
+  document.getElementById('ai-narration-loading').style.display = 'block';
+  document.getElementById('ai-narration-content').style.display = 'none';
+  document.getElementById('ai-narration-error').style.display = 'none';
+
+  const prompt = `You are a functional medicine clinician. Based on the following ascorbate C-Cleanse calibration session data, write two sections:
+
+SESSION DATA:
+- Patient health status: ${healthStatus}
+- Total l-ascorbate to bowel tolerance (flush): ${flushTotal.toFixed(1)} g
+- Number of doses taken: ${doseCount}
+- Session duration: ${duration} minutes
+- Daily therapeutic dose (75% of flush): ${daily} g
+- Per dose if taken 4x daily: ${(daily/4).toFixed(1)} g
+- Per dose if taken 2x daily: ${(daily/2).toFixed(1)} g
+
+SECTION 1 — CLINICAL NOTE (formal, third-person, SOAP-style, 4-6 sentences):
+Write as a chart note. Include the calibration finding, bowel tolerance threshold, recommended daily maintenance dose, and frequency. Use proper clinical terminology. Reference the buffered mineral l-ascorbate protocol.
+
+SECTION 2 — PATIENT EXPLANATION (warm, first-person address "you", plain language, 4-5 sentences):
+Explain what the session means for the patient's health, what the daily dose will do for them, and encourage consistent use. Avoid jargon. Make it motivating and clear.
+
+Format your response as valid JSON only, no markdown:
+{"clinical": "...", "patient": "..."}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content.find(b => b.type === 'text')?.text || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    document.getElementById('ai-clinical-note').textContent = parsed.clinical;
+    document.getElementById('ai-patient-note').textContent = parsed.patient;
+    document.getElementById('ai-narration-loading').style.display = 'none';
+    document.getElementById('ai-narration-content').style.display = 'block';
+
+  } catch(e) {
+    document.getElementById('ai-narration-loading').style.display = 'none';
+    document.getElementById('ai-error-text').textContent = 'Could not generate summary. Check connection and try again.';
+    document.getElementById('ai-narration-error').style.display = 'flex';
+  }
+}
+
+function cancelSession() {
+  // Stop all timers and audio
+  clearInterval(sessionState.timerHandle);
+  clearInterval(sessionState.elapsedHandle);
+  stopAlert();
+  // Reset full session state
+  sessionState.running = false;
+  sessionState.timerHandle = null;
+  sessionState.elapsedHandle = null;
+  sessionState.doses = [];
+  sessionState.totalGrams = 0;
+  sessionState.sessionStart = null;
+  sessionState.oneTimeDouble = false;
+  sessionState.beepInterval = null;
+  newSession();
+}
+
+function newSession() {
+  // Hide all session screens
+  document.getElementById('session-complete').style.display = 'none';
+  document.getElementById('session-active').style.display = 'none';
+  document.getElementById('session-setup').style.display = 'block';
+  // Reset stat displays
+  document.getElementById('stat-doses').textContent = '0';
+  document.getElementById('stat-grams').innerHTML = '0.0<span class="stat-unit">g</span>';
+  document.getElementById('stat-elapsed').textContent = '0:00';
+  // Reset dose log
+  document.getElementById('dose-log').innerHTML = '<div class="empty-log">No doses logged yet — press "Log Dose Taken" after each dose</div>';
+  // Reset buttons
+  document.getElementById('start-btn').style.display = 'inline-flex';
+  document.getElementById('stop-resume-btn').style.display = 'none';
+  document.getElementById('add-dose-btn').style.display = 'none';
+  document.getElementById('double-dose-btn').classList.remove('btn-double-active');
+  document.getElementById('double-dose-btn').textContent = '↑ Double Dose';
+  document.getElementById('mute-btn').style.display = 'none';
+  document.getElementById('four-dose-alert').style.display = 'none';
+  document.getElementById('fifty-gram-alert').style.display = 'none';
+  updateStartDose();
+}
+
+// ═══ CALCULATOR ═══
+function calcFromHalfTsp() {
+  const ht = parseFloat(document.getElementById('calc-half-tsp').value);
+  if (isNaN(ht) || ht <= 0) { document.getElementById('calc-results').style.display = 'none'; return; }
+  const grams = ht * 1.5;
+  document.getElementById('calc-grams').value = grams.toFixed(1);
+  renderCalcResults(grams);
+}
+
+function calcFromGrams() {
+  const g = parseFloat(document.getElementById('calc-grams').value);
+  if (isNaN(g) || g <= 0) { document.getElementById('calc-results').style.display = 'none'; return; }
+  document.getElementById('calc-half-tsp').value = Math.round(g / 1.5);
+  renderCalcResults(g);
+}
+
+function renderCalcResults(grams) {
+  const daily = parseFloat((grams * 0.75).toFixed(1));
+  const halfTspDay = Math.round(daily / 1.5);
+
+  document.getElementById('cr-flush').textContent = grams.toFixed(1) + ' g';
+  document.getElementById('cr-daily').textContent = daily + ' g';
+  document.getElementById('cr-half-tsp-day').textContent = halfTspDay;
+
+  const breaks = [
+    { doses: 2, each: (daily/2).toFixed(2) },
+    { doses: 3, each: (daily/3).toFixed(2) },
+    { doses: 4, each: (daily/4).toFixed(2) },
+  ];
+  document.getElementById('per-dose-table').innerHTML = `
+    <table>
+      <thead><tr><th>Divided By</th><th>Per Dose (g)</th><th>Per Dose (tsp)</th></tr></thead>
+      <tbody>
+        ${breaks.map(b => `
+          <tr>
+            <td>${b.doses}× daily</td>
+            <td class="highlight">${b.each} g</td>
+            <td>${(parseFloat(b.each)/3).toFixed(2)} tsp</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>`;
+
+  const alert50 = document.getElementById('calc-alert-50');
+  if (grams > 50) {
+    const extra = (grams * 0.1).toFixed(1);
+    document.getElementById('calc-alert-50-text').textContent =
+      `Flush was ${grams.toFixed(1)} g (>50 g). Take at least ${extra} g in late afternoon/evening.`;
+    alert50.style.display = 'flex';
+  } else {
+    alert50.style.display = 'none';
+  }
+
+  document.getElementById('calc-results').style.display = 'block';
+}
+
+// ═══ REFERENCE TABLE ═══
+function buildRefTable() {
+  const data = [
+    [6,3,9,4.5,7],
+    [10,5,15,7.5,12],
+    [16,8,24,18,12], // interpolated
+    [25,12.5,37.5,19,28],
+    [50,25,75,37.5,56],
+    [90,45,135,67.5,101],
+  ];
+  const rows = [
+    {ht:6, tsp:3, flush:9, daily:6.75, htDay:4.5},
+    {ht:10, tsp:5, flush:15, daily:11.25, htDay:7.5},
+    {ht:16, tsp:8, flush:24, daily:18, htDay:12},
+    {ht:25, tsp:12.5, flush:37.5, daily:28.1, htDay:19},
+    {ht:50, tsp:25, flush:75, daily:56.3, htDay:37.5},
+    {ht:90, tsp:45, flush:135, daily:101.3, htDay:67.5},
+  ];
+
+  // Build from scratch with clean math
+  const tbody = document.getElementById('ref-table-body');
+  const entries = [
+    [6, 9], [10, 15], [14, 21], [20, 30], [25, 37.5], [34, 51],
+    [50, 75], [60, 90], [90, 135]
+  ];
+  tbody.innerHTML = entries.map(([ht, g]) => {
+    const daily = parseFloat((g * 0.75).toFixed(1));
+    const htDay = Math.round(daily / 1.5);
+    return `<tr>
+      <td>${ht}</td>
+      <td class="highlight">${g} g</td>
+      <td class="highlight">${daily} g</td>
+      <td>${htDay}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══ TOAST ═══
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══ BEEP (Web Audio) ═══
+function stopAlert() {
+  // Stop the repeating beep
+  if (sessionState.beepInterval) {
+    clearInterval(sessionState.beepInterval);
+    sessionState.beepInterval = null;
+  }
+  // Hide inline session button
+  const btn = document.getElementById('mute-btn');
+  if (btn) {
+    btn.classList.remove('btn-alert-flash');
+    btn.textContent = '🔔 Sound On';
+    btn.style.display = 'none';
+  }
+  // Hide floating button
+  const floatBtn = document.getElementById('floating-alert-btn');
+  if (floatBtn) floatBtn.style.display = 'none';
+}
+
+// ═══ AUDIO ═══
+function getAudioCtx() {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  const ctx = new AC();
+  return ctx;
+}
+
+function playAlertSound(type) {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const ctx = new AC();
+    const t = ctx.currentTime;
+    const sound = type || sessionState.alertSound || 'gong';
+    switch(sound) {
+      case 'beep':  playBeep(ctx, t);  break;
+      case 'chime': playChime(ctx, t); break;
+      case 'gong':  playGong(ctx, t);  break;
+      case 'bell':  playBell(ctx, t);  break;
+      case 'pulse': playPulse(ctx, t); break;
+      default:      playGong(ctx, t);
+    }
+    // Auto-close context after sound finishes
+    setTimeout(() => { try { ctx.close(); } catch(e){} }, 4000);
+  } catch(e) { console.warn('Sound failed:', e); }
+}
+
+function previewSound() {
+  const type = document.getElementById('alert-sound').value;
+  playAlertSound(type);
+}
+
+function playBeep(ctx, t) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(880, t);
+  gain.gain.setValueAtTime(0.35, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
+  osc.start(t); osc.stop(t + 1.0);
+}
+
+function playChime(ctx, t) {
+  [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, t + i * 0.18);
+    gain.gain.setValueAtTime(0, t + i * 0.18);
+    gain.gain.linearRampToValueAtTime(0.3, t + i * 0.18 + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.18 + 0.7);
+    osc.start(t + i * 0.18); osc.stop(t + i * 0.18 + 0.8);
+  });
+}
+
+function playGong(ctx, t) {
+  // Deep gong: fundamental + harmonics with long decay
+  [[80, 0.5], [160, 0.3], [320, 0.15], [480, 0.1], [640, 0.05]].forEach(([freq, amp]) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(amp, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 3.5);
+    osc.start(t); osc.stop(t + 3.5);
+  });
+  // Strike transient
+  const noise = ctx.createOscillator();
+  const noiseGain = ctx.createGain();
+  noise.connect(noiseGain); noiseGain.connect(ctx.destination);
+  noise.type = 'sawtooth';
+  noise.frequency.setValueAtTime(120, t);
+  noiseGain.gain.setValueAtTime(0.4, t);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+  noise.start(t); noise.stop(t + 0.1);
+}
+
+function playBell(ctx, t) {
+  [[440, 1.0], [880, 0.6], [1320, 0.3], [1760, 0.15]].forEach(([freq, amp]) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(amp * 0.3, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 2.0);
+    osc.start(t); osc.stop(t + 2.0);
+  });
+}
+
+function playPulse(ctx, t) {
+  [0, 0.25, 0.5].forEach(offset => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(660, t + offset);
+    gain.gain.setValueAtTime(0.25, t + offset);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + offset + 0.18);
+    osc.start(t + offset); osc.stop(t + offset + 0.2);
+  });
+}
+
+function copySection(elementId, btnId) {
+  const el = document.getElementById(elementId);
+  const btn = document.getElementById(btnId);
+  if (!el || !btn) return;
+  const text = el.textContent || el.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 Copy';
+      btn.classList.remove('copied');
+    }, 2500);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 Copy';
+      btn.classList.remove('copied');
+    }, 2500);
+  });
+}
+
+
+// ═══ GLOSSARY SYSTEM ═══
+const GLOSSARY = {};
+GLOSSARY['ROS'] = 'Reactive Oxygen Species. Chemically reactive molecules containing oxygen (e.g. superoxide, hydroxyl radical, hydrogen peroxide) that cause oxidative damage to cells, DNA, lipids, and proteins when produced in excess.';
+GLOSSARY['SOD'] = 'Superoxide Dismutase. An enzyme that catalyzes the dismutation of superoxide radicals into oxygen and hydrogen peroxide. First line of enzymatic antioxidant defense. Notably absent from the cell nucleus — where ascorbate fills this role.';
+GLOSSARY['SVCT1'] = 'Sodium-dependent Vitamin C Transporter 1 (SLC23A1). Located on the apical brush-border membrane of intestinal epithelium and renal tubules. High-capacity, Na-coupled transporter responsible for whole-body ascorbate homeostasis and renal reabsorption.';
+GLOSSARY['SVCT2'] = 'Sodium-dependent Vitamin C Transporter 2 (SLC23A2). Ubiquitously expressed — especially in brain, retina, adrenal glands, and placenta. High-affinity, low-capacity transporter that protects metabolically active and neurological tissues from oxidative stress.';
+GLOSSARY['GLUT'] = 'Glucose Transporter. A family of membrane proteins that facilitate glucose uptake. GLUT1 and GLUT3 also transport dehydroascorbic acid (DHA, oxidized vitamin C). High blood glucose competitively inhibits DHA uptake — reducing intracellular vitamin C in diabetics.';
+GLOSSARY['GLUT1'] = 'Glucose Transporter 1. Present in erythrocytes, brain endothelium, and most tissues. Transports both glucose and dehydroascorbic acid (DHA). Upregulated under hypoxic conditions.';
+GLOSSARY['GLUT3'] = 'Glucose Transporter 3. Primarily expressed in neurons and the brain. Also transports DHA (oxidized vitamin C). High affinity for both substrates.';
+GLOSSARY['GLUT4'] = 'Glucose Transporter 4. Insulin-regulated transporter in muscle and adipose tissue. Its expression is stimulated by insulin — indirectly improving ascorbate availability in insulin-sensitive tissues.';
+GLOSSARY['DMT-1'] = 'Divalent Metal Transporter 1. Located on the apical surface of intestinal enterocytes. Transports ferrous iron (Fe2+) into the cell. Ascorbate reduces Fe3+ to Fe2+ to make iron compatible with DMT-1.';
+GLOSSARY['DHA'] = 'Dehydroascorbic Acid. The fully oxidized form of vitamin C. Transported into cells via GLUT1/3, then rapidly reduced back to ascorbate by glutathione and thioredoxin reductase. Maintains less than 10% of total plasma ascorbate under normal conditions.';
+GLOSSARY['AA'] = 'Ascorbic Acid (L-Ascorbate). The biologically active, reduced form of vitamin C. Exists as a monoanion at physiological pH. Primary electron donor and antioxidant in plasma and cytoplasm.';
+GLOSSARY['eNOS'] = 'Endothelial Nitric Oxide Synthase. The enzyme responsible for producing nitric oxide (NO) from L-arginine in endothelial cells. Ascorbate upregulates eNOS expression, increases BH4 cofactor availability, and scavenges superoxide that would otherwise degrade NO.';
+GLOSSARY['NO'] = 'Nitric Oxide. A gaseous signaling molecule produced by eNOS in the endothelium. Primary vasodilator — relaxes vascular smooth muscle, lowers blood pressure, and prevents platelet aggregation and atherosclerosis.';
+GLOSSARY['BH4'] = 'Tetrahydrobiopterin. The essential cofactor for endothelial nitric oxide synthase (eNOS). Without adequate BH4, eNOS becomes uncoupled and produces superoxide instead of NO. Ascorbate increases BH4 bioavailability, maintaining eNOS coupling and NO production.';
+GLOSSARY['NF-kB'] = 'Nuclear Factor Kappa B. A master transcription factor that controls expression of pro-inflammatory cytokines (TNF-alpha, IL-6), adhesion molecules (ICAM-1, VCAM-1), and enzymes (COX-2). Ascorbate inhibits NF-kB activation, reducing chronic vascular inflammation.';
+GLOSSARY['Nrf2'] = 'Nuclear Factor Erythroid 2-Related Factor 2. A transcription factor that activates the antioxidant response element (ARE), upregulating HO-1, NQO1, glutathione synthase, and other cytoprotective enzymes. Ascorbate activates Nrf2, boosting the endogenous antioxidant defense system.';
+GLOSSARY['HIF-1a'] = 'Hypoxia-Inducible Factor 1-alpha. A transcription factor activated under low oxygen conditions, driving expression of VEGF, erythropoietin, and glycolytic enzymes. Prolyl hydroxylases (PHDs), which require ascorbate, hydroxylate HIF-1a to mark it for degradation under normoxia.';
+GLOSSARY['PHD'] = 'Prolyl Hydroxylase Domain enzyme. Ascorbate-dependent dioxygenases that hydroxylate HIF-1a proline residues under normal oxygen conditions, targeting HIF-1a for proteasomal degradation. Deficiency mimics a hypoxic state.';
+GLOSSARY['TET'] = 'Ten-Eleven Translocation enzymes. Ascorbate-dependent dioxygenases that catalyze DNA demethylation — converting 5-methylcytosine to 5-hydroxymethylcytosine. Critical for epigenetic reprogramming, stem cell pluripotency, and neuronal gene regulation.';
+GLOSSARY['LDL'] = 'Low-Density Lipoprotein. The primary cholesterol carrier in plasma. Oxidized LDL is a key initiator of atherosclerotic plaque formation. Ascorbate must be fully depleted from plasma before LDL oxidation can begin — making it the first cardiovascular defense.';
+GLOSSARY['ICAM-1'] = 'Intercellular Adhesion Molecule 1. A cell surface glycoprotein upregulated by NF-kB on endothelial cells during inflammation. Promotes leukocyte adhesion and transmigration into arterial walls — an early step in atherosclerosis. Suppressed by ascorbate.';
+GLOSSARY['VCAM-1'] = 'Vascular Cell Adhesion Molecule 1. Expressed on activated endothelial cells in response to inflammatory cytokines. Mediates monocyte adhesion to the vascular wall in atherogenesis. Ascorbate inhibits VCAM-1 expression via NF-kB suppression.';
+GLOSSARY['TGF-b'] = 'Transforming Growth Factor Beta. A cytokine regulating extracellular matrix remodeling, fibrosis, and cell proliferation. Ascorbate modulates TGF-b-mediated collagen remodeling in the cardiovascular extracellular matrix.';
+GLOSSARY['8-OHdG'] = '8-Hydroxy-deoxyguanosine. A biomarker of oxidative DNA damage caused by hydroxyl radicals attacking guanine bases. Elevated 8-OHdG is associated with cancer risk, aging, and chronic disease. Ascorbate prevents its formation by neutralizing nuclear ROS.';
+GLOSSARY['GULO'] = 'L-Gulonolactone Oxidase. The enzyme catalyzing the final step in glucose-to-ascorbate biosynthesis. Humans, primates, and guinea pigs carry a non-functional GULO pseudogene — making dietary vitamin C essential. Most other mammals synthesize 10-30 g/day via GULO.';
+GLOSSARY['PAM'] = 'Peptidyl-Glycine Alpha-Amidating Monooxygenase. A copper-containing enzyme requiring ascorbate as electron donor. Catalyzes C-terminal amidation of approximately 50% of all biologically active neuropeptides and hormones — including oxytocin, vasopressin, gastrin, calcitonin, and CRH.';
+GLOSSARY['HO-1'] = 'Heme Oxygenase 1. An Nrf2-regulated cytoprotective enzyme that degrades heme into biliverdin, carbon monoxide, and free iron. Provides anti-inflammatory and antioxidant protection in vascular tissue. Upregulated by ascorbate via Nrf2 activation.';
+GLOSSARY['NQO1'] = 'NAD(P)H Quinone Oxidoreductase 1. An Nrf2-target enzyme that performs two-electron reduction of quinones, preventing generation of semiquinone radicals. Protects against oxidative stress. Induced by ascorbate via Nrf2 pathway.';
+GLOSSARY['VEGF'] = 'Vascular Endothelial Growth Factor. A signaling protein that stimulates angiogenesis (new blood vessel formation). Regulated by HIF-1a. Ascorbate promotes endothelial proliferation and capillary formation, partly via type IV collagen synthesis.';
+GLOSSARY['HPA'] = 'Hypothalamic-Pituitary-Adrenal Axis. The central stress-response system. The adrenal glands have the highest ascorbate concentration in the body (~2000 uM). Under psychological stress, adrenal ascorbate is rapidly released — measurable by adrenal ascorbate depletion.';
+GLOSSARY['GDM'] = 'Gestational Diabetes Mellitus. Diabetes first diagnosed during pregnancy. Ascorbate intake modifies the association between heavy metal exposure (mercury, arsenic) and GDM risk by attenuating oxidative stress and beta-cell dysfunction.';
+GLOSSARY['EDTA'] = 'Ethylenediaminetetraacetic Acid. A synthetic chelating agent used medically for heavy metal poisoning (lead, mercury). Ascorbate has chelating activity approximately 40-50x less potent than EDTA per mole but is additive with EDTA when combined.';
+GLOSSARY['oxLDL'] = 'Oxidized Low-Density Lipoprotein. LDL that has been oxidatively modified by free radicals. Taken up by macrophages to form foam cells — the hallmark of early atherosclerotic plaque. Ascorbate prevents LDL oxidation as the first plasma antioxidant consumed.';
+GLOSSARY['CRH'] = 'Corticotropin-Releasing Hormone. A neuropeptide produced by the hypothalamus that initiates the HPA stress response. Requires PAM enzyme (ascorbate-dependent) for C-terminal amidation and biological activity.';
+GLOSSARY['COX-2'] = 'Cyclooxygenase-2. An inducible enzyme that converts arachidonic acid to prostaglandins, mediating inflammation and pain. Upregulated by NF-kB. Ascorbate reduces COX-2 expression indirectly via NF-kB inhibition.';
+GLOSSARY['NADPH'] = 'Nicotinamide Adenine Dinucleotide Phosphate (reduced). A key cellular reducing agent and electron carrier. NADPH-dependent reductases (including thioredoxin reductase) recycle dehydroascorbic acid back to active ascorbate, completing the ascorbate recycling loop.';
+GLOSSARY['NK cells'] = 'Natural Killer Cells. Innate immune lymphocytes that kill virus-infected and tumor cells without prior sensitization. Ascorbate stimulates NK cell proliferation and cytotoxic activity, enhancing immune surveillance.';
+GLOSSARY['DMSA'] = 'Dimercaptosuccinic Acid. A chelating agent used clinically for lead and mercury poisoning. Increases urinary excretion of arsenic, cadmium, lead, and methylmercury. Used in conjunction with ascorbate in some integrative detoxification protocols.';
+GLOSSARY['AFR'] = 'Ascorbyl Free Radical (Monodehydroascorbate). The stable intermediate formed when ascorbate donates one electron. Notably unreactive — it preferentially dismutates back to ascorbate and DHA rather than propagating radical chain reactions. Key to ascorbate safety as an antioxidant.';
+GLOSSARY['TNF-a'] = 'Tumor Necrosis Factor Alpha. A pro-inflammatory cytokine produced by macrophages and other immune cells. Activates NF-kB and promotes endothelial dysfunction. Ascorbate inhibits TNF-a-induced endothelial apoptosis and ICAM-1 expression.';
+GLOSSARY['IL-6'] = 'Interleukin-6. A pleiotropic cytokine involved in acute-phase response, immune regulation, and chronic inflammation. Elevated IL-6 is a cardiovascular risk marker. Ascorbate reduces IL-6 production via NF-kB suppression.';
+GLOSSARY['ATP'] = 'Adenosine Triphosphate. The primary energy currency of the cell. Ascorbate enhances ATP production by supporting mitochondrial function, carnitine biosynthesis (for fatty acid oxidation), and reducing oxidative damage to mitochondrial DNA and membranes.';
+GLOSSARY['eNOS uncoupling'] = 'A pathological state in which endothelial nitric oxide synthase (eNOS) produces superoxide instead of nitric oxide (NO) due to insufficient BH4 cofactor. Worsens oxidative stress and reduces vasodilation. Ascorbate prevents uncoupling by preserving BH4.';
+GLOSSARY['5mC'] = '5-Methylcytosine. A DNA base modification representing the primary epigenetic silencing mark in mammals. TET enzymes (ascorbate-dependent) oxidize 5mC to 5hmC as the first step in active DNA demethylation and gene reactivation.';
+GLOSSARY['5hmC'] = '5-Hydroxymethylcytosine. An oxidized DNA methylation intermediate produced by TET enzymes from 5mC. Acts as both an intermediate in demethylation and a stable epigenetic mark associated with active gene expression. Ascorbate is required for TET activity.';
+
+let glossaryActive = false;
+
+function toggleGlossary() {
+  glossaryActive = !glossaryActive;
+  const btn = document.getElementById('glossary-nav-btn');
+  const pill = document.getElementById('glossary-pill');
+  if (glossaryActive) {
+    btn.style.background = '#2a2210';
+    btn.style.color = '#c9a84c';
+    btn.style.fontWeight = '500';
+    if (pill) pill.classList.add('on');
+    document.querySelectorAll('.gloss').forEach(el => el.classList.remove('gloss-hidden'));
+  } else {
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.style.fontWeight = '';
+    if (pill) pill.classList.remove('on');
+    document.querySelectorAll('.gloss').forEach(el => el.classList.add('gloss-hidden'));
+    hideGlossPopup();
+  }
+}
+
+function showGlossPopup(term, def, event) {
+  if (!glossaryActive) return;
+  const popup = document.getElementById('gloss-popup');
+  document.getElementById('gloss-popup-term').textContent = term;
+  document.getElementById('gloss-popup-def').textContent = def;
+  popup.classList.add('visible');
+  positionPopup(event);
+}
+
+function positionPopup(event) {
+  const popup = document.getElementById('gloss-popup');
+  const x = event.clientX || (event.touches && event.touches[0].clientX) || 0;
+  const y = event.clientY || (event.touches && event.touches[0].clientY) || 0;
+  const pw = popup.offsetWidth || 320;
+  const ph = popup.offsetHeight || 100;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  let left = x + 14;
+  let top = y - 20;
+  if (left + pw > vw - 10) left = x - pw - 14;
+  if (top + ph > vh - 10) top = vh - ph - 10;
+  if (top < 10) top = 10;
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+}
+
+function hideGlossPopup() {
+  document.getElementById('gloss-popup').classList.remove('visible');
+}
+
+document.addEventListener('mousemove', function(e) {
+  if (document.getElementById('gloss-popup').classList.contains('visible')) {
+    positionPopup(e);
+  }
+});
+
+document.addEventListener('click', function(e) {
+  if (!e.target.classList.contains('gloss')) hideGlossPopup();
+});
+
+function applyGlossary() {
+  const panel = document.getElementById('panel-science');
+  if (!panel) return;
+
+  // Walk text nodes and wrap terms
+  const terms = Object.keys(GLOSSARY);
+  // Sort by length desc to match longest first
+  terms.sort((a, b) => b.length - a.length);
+
+  // Build regex — escape special chars
+  function escRx(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  // Process all text-containing elements
+  const walker = document.createTreeWalker(panel, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node) {
+      const parent = node.parentElement;
+      if (!parent) return NodeFilter.FILTER_REJECT;
+      const tag = parent.tagName;
+      if (['SCRIPT','STYLE','BUTTON','SELECT','INPUT'].includes(tag)) return NodeFilter.FILTER_REJECT;
+      if (parent.classList.contains('gloss')) return NodeFilter.FILTER_REJECT;
+      if (node.textContent.trim() === '') return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  const nodes = [];
+  let node;
+  while ((node = walker.nextNode())) nodes.push(node);
+
+  nodes.forEach(textNode => {
+    let html = textNode.textContent;
+    let replaced = false;
+    terms.forEach(term => {
+      // Match whole word or known acronym patterns
+      const rx = new RegExp('(?<![\\w/·])(eNOS uncoupling|' + escRx(term) + ')(?![\\w])', 'g');
+      if (rx.test(html)) {
+        html = html.replace(new RegExp('(?<![\\w/·])(' + escRx(term) + ')(?![\\w])', 'g'), (match) => {
+          const def = GLOSSARY[term] || '';
+          return `<span class="gloss gloss-hidden" data-term="${term}" onmouseenter="showGlossPopup('${term}', GLOSSARY['${term}'], event)" ontouchstart="showGlossPopup('${term}', GLOSSARY['${term}'], event)" onmouseleave="hideGlossPopup()">${match}</span>`;
+        });
+        replaced = true;
+      }
+    });
+    if (replaced) {
+      const span = document.createElement('span');
+      span.innerHTML = html;
+      textNode.parentNode.replaceChild(span, textNode);
+    }
+  });
+}
+
+// ═══ INIT ═══
+buildRefTable();
+updateStartDose();
+// Apply glossary markup after DOM is ready
+setTimeout(applyGlossary, 300);
+</script>
+</body>
+</html>
